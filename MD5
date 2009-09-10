@@ -1,0 +1,14 @@
+3de996d1967213ca8a195f044d6ae810 *DESCRIPTION
+e4567ae030727d2c5cc7cab39a7edc10 *NAMESPACE
+09f8c050debc4918ccf2187cd4b461a0 *R/miscellanea.R
+de7263233d9fe6993e2d891fe74be447 *R/speedglm.R
+6419ef6c83a18b4e0af7992de34fab18 *R/speedlm.R
+b9f54720c6c814c4dabbaab5e190aa56 *R/summary.speedglm.R
+8871b0006c16e73ae853fc2bb334e99f *R/summary.speedlm.r
+75cab68cd222708075ebe98a99e59787 *R/uncommented.r
+42d2bf83121587dcfd0ad9fddfb55dcf *man/miscellanea-Internal.Rd
+1dc41f0e4a08b349b1b4064dfe06c6ae *man/speedglm-package.rd
+27396203aed61f519e8c29dd4a7e5527 *man/speedglm.Rd
+910bf1061f63b804db7cad1e31fa256e *man/speedlm.Rd
+fd2f7083923a35f0b615976e962604f1 *man/summary.speedglm.Rd
+f8f9234543aff17572db18605a7f6187 *man/summary.speedlm.Rd
