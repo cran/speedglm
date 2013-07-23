@@ -120,7 +120,10 @@ Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not
             }
             
 \author{ Marco ENEA }
-\note{All the above functions make an object of class 'speedglm'}
+\note{All the above functions make an object of class 'speedglm'.\cr
+In the current package version, arguments \code{start}, \code{mustart} and \code{etastart} of function \code{shglm} have been disabled. 
+These will be restored in future.}
+
 
  %Make other sections like Warning with \section{Warning }{....} 
 %}

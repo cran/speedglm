@@ -58,7 +58,7 @@ speedglm.wfit <- function(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
     start <- rep(0,nvar)
   } else { 
     eta <- offset + as.vector(if (nvar == 1) X*start else {
-      if (sparse) t(X)%*%start else tcrossprod(X,t(start))})
+      if (sparse) X%*%start else tcrossprod(X,t(start))})
     mu <- linkinv(eta)
   }  
   iter <- 0
@@ -125,6 +125,9 @@ shglm <- function(formula, datafun, family = gaussian(), weights.fo = NULL,
                   start = NULL, etastart = NULL, mustart = NULL, offset = NULL,
                   maxit = 25, k = 2, chunksize = 5000, sparse = NULL, 
                   all.levels = FALSE, set.default = list(), ...){
+    if (!is.null(start)) stop("Sorry, code for argument start is not implemented yet")
+    if (!is.null(mustart)) stop("Sorry, code for argument mustart is not implemented yet")
+    if (!is.null(etastart)) stop("Sorry, code for argument etastart is not implemented yet")
     dati <- datafun(reset = TRUE)
     dati <- datafun(reset = FALSE)
     call <- match.call()
@@ -268,7 +271,8 @@ shglm <- function(formula, datafun, family = gaussian(), weights.fo = NULL,
                     "'", "<-levels(M[,fa[i]])", sep = "")))
                   a <- c(obj$levels[[j]][!(obj$levels[[j]] %in%
                     flevels[[j]])], flevels[[j]])
-                    flevels[[j]] <- sort(order(a))
+                  #  flevels[[j]] <- sort(order(a))
+                    flevels[[j]] <- sort(a)
                 }
                 M <- model.frame(obj$terms, dati, xlev = flevels)
                 X <- model.matrix(obj$terms, M, xlev = flevels)
