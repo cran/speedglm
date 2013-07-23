@@ -1,8 +1,6 @@
-`speedglm` <-
-function(formula,data,family=gaussian(),weights=NULL,start=NULL,
-                   etastart=NULL,mustart=NULL,offset=NULL,maxit=25, k=2, 
-                   sparse=NULL,set.default=list(),...)
-{
+speedglm <- function(formula,data,family=gaussian(),weights=NULL,start=NULL,
+                     etastart=NULL,mustart=NULL,offset=NULL,maxit=25, k=2, 
+                     sparse=NULL,set.default=list(),...){
   call <- match.call()
   tf <- terms(formula)
   M  <- model.frame(tf,data)
@@ -33,14 +31,12 @@ function(formula,data,family=gaussian(),weights=NULL,start=NULL,
   rval  
 }
 
-`speedglm.wfit` <-
-function(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
+speedglm.wfit <- function(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
                           family=gaussian(), start=NULL, etastart=NULL,
                           mustart=NULL, offset=NULL, acc=1e-08, maxit=25, k=2,
                           sparselim=.9,camp=.01, eigendec=TRUE, tol.values=1e-7,
                           tol.vectors=1e-7, tol.solve=.Machine$double.eps,
-                          method = "eigen", sparse=NULL,...)
-{
+                          method = "eigen", sparse=NULL,...){
   nobs <- NROW(y)
   nvar <- ncol(X) 
   if (missing(y)) stop("Argument y is missing")
@@ -125,13 +121,12 @@ function(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
   rval
 }
 
-shglm <- function (formula, data, family = gaussian(), weights.fo = NULL,
-    start = NULL, etastart = NULL, mustart = NULL, offset = NULL,
-    maxit = 25, k = 2, chunksize = 5000, sparse = NULL, all.levels = FALSE,
-    set.default = list(), ...)
-{
-    dati <- data(reset = TRUE)
-    dati <- data(reset = FALSE)
+shglm <- function(formula, datafun, family = gaussian(), weights.fo = NULL,
+                  start = NULL, etastart = NULL, mustart = NULL, offset = NULL,
+                  maxit = 25, k = 2, chunksize = 5000, sparse = NULL, 
+                  all.levels = FALSE, set.default = list(), ...){
+    dati <- datafun(reset = TRUE)
+    dati <- datafun(reset = FALSE)
     call <- match.call()
     tf <- terms(formula)
     M <- model.frame(tf, dati)
@@ -243,7 +238,7 @@ shglm <- function (formula, data, family = gaussian(), weights.fo = NULL,
             RSS <- RSS + sum(W * res * res)
             if (iter == 1) weights.cum <- weights.cum + sum(weights == 0)
             
-            if (is.null(dati <- data(reset = FALSE))) {
+            if (is.null(dati <- datafun(reset = FALSE))) {
               if (iter == 1) {
                 ris <- if (set$eigendec)
                   control(XTX,,set$tol.values,set$tol.vectors,out.B=FALSE,set$method) else
@@ -256,8 +251,8 @@ shglm <- function (formula, data, family = gaussian(), weights.fo = NULL,
               
               tol <- max(abs(dev.prec - dev)/(abs(dev) + 0.1))
               if ((tol > set$acc) & (iter < maxit)) {
-                dati <- data(reset = TRUE)
-                dati <- data(reset = FALSE)
+                dati <- datafun(reset = TRUE)
+                dati <- datafun(reset = FALSE)
                 eof <- TRUE
               } else break
             }
@@ -301,7 +296,7 @@ shglm <- function (formula, data, family = gaussian(), weights.fo = NULL,
             }
         }
     }
-    data(reset = TRUE)
+    datafun(reset = TRUE)
     rank <- ris$rank
     n.ok <- tot.obs - zero.weights
     nulldf <- n.ok - as.integer(intercept)

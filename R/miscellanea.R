@@ -1,8 +1,8 @@
 
-control<-function (B, symmetric = TRUE, tol.values = 1e-07, tol.vectors = 1e-07,
-    out.B = TRUE, method = "eigen")
-{
-  if (!(method %in% c("eigen","Cholesky"))) stop("method not valid or not implemented")
+control<-function(B, symmetric = TRUE, tol.values = 1e-07, tol.vectors = 1e-07,
+                   out.B = TRUE, method = "eigen"){
+  if (!(method %in% c("eigen","Cholesky"))) 
+     stop("method not valid or not implemented")
   if (method=="eigen"){
     n <- ncol(B)
     sa <- 1:n
@@ -24,8 +24,7 @@ control<-function (B, symmetric = TRUE, tol.values = 1e-07, tol.vectors = 1e-07,
         i <- i + 1
     }
     ok <- if (!is.null(nok))
-        sa[-nok]
-    else sa
+        sa[-nok] else sa
     }
     if (method=="Cholesky"){
       A <- chol(B, pivot = TRUE)
@@ -42,8 +41,7 @@ control<-function (B, symmetric = TRUE, tol.values = 1e-07, tol.vectors = 1e-07,
 }
 
 
-cp<-function (X, w = NULL, row.chunk = NULL, sparse = FALSE)
-{
+cp <- function(X, w = NULL, row.chunk = NULL, sparse = FALSE){
     if (sparse) {
         if (!is.null(w)) X<-sqrt(w) * X
         if (class(X) != "dgCMatrix")
@@ -53,10 +51,8 @@ cp<-function (X, w = NULL, row.chunk = NULL, sparse = FALSE)
     else {
         if (is.null(row.chunk)) {
             new.B <- if (is.null(w))
-                crossprod(X)
-            else crossprod(sqrt(w) * X)
-        }
-        else {
+                crossprod(X) else crossprod(sqrt(w) * X)
+        } else {
             if (row.chunk >= (nrow(X) - 1))
                 row.chunk <- nrow(X)
             if (row.chunk <= 1)
@@ -76,8 +72,7 @@ cp<-function (X, w = NULL, row.chunk = NULL, sparse = FALSE)
                 }
                 if (mod > 0)
                   new.B <- new.B + crossprod(X[j:nrow(X), ])
-            }
-            else {
+            } else {
                 for (i in 1:G) {
                   B <- crossprod(sqrt(w[j:(i * a)]) * X[j:(i *
                     a), ])
@@ -93,8 +88,7 @@ cp<-function (X, w = NULL, row.chunk = NULL, sparse = FALSE)
     as(new.B, "matrix")
 }
 
-`is.sparse` <-
-function(X,sparselim=.9,camp=.05){
+is.sparse <- function(X,sparselim=.9,camp=.05){
   if (prod(dim(X))<500) camp <- 1
   subX<-sample(X,round((nrow(X)*ncol(X)*camp),digits=0),replace=FALSE)
   p<-sum(subX==0)/prod(length(subX))

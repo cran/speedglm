@@ -18,4 +18,4 @@ S3method(AIC,speedlm)
 S3method(coef,speedlm)
 S3method(vcov,speedlm)
 S3method(logLik,speedlm)
-
+S3method(update,speedlm)

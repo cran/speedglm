@@ -22,23 +22,25 @@ speedglm(formula, data, family = gaussian(), weights = NULL, start = NULL,
 
 ## S3 method for class 'matrix':       
 speedglm.wfit(y, X, intercept = TRUE, weights = NULL, row.chunk = NULL,
-              family = gaussian(), start = NULL, etastart = NULL, mustart = NULL,
-              offset = NULL, acc = 1e-08, maxit = 25, k = 2, sparselim = .9, 
-              camp = .01, eigendec = TRUE, tol.values = 1e-7, tol.vectors = 1e-7,
-              tol.solve = .Machine$double.eps, method = "eigen", sparse = NULL,...)     
+              family = gaussian(), start = NULL, etastart = NULL,
+              mustart = NULL, offset = NULL, acc = 1e-08, maxit = 25, k = 2,
+              sparselim = .9, camp = .01, eigendec = TRUE, tol.values = 1e-7,
+              tol.vectors = 1e-7, tol.solve = .Machine$double.eps,
+              method = "eigen", sparse = NULL,...)
               
 ## S3 method for class 'function':              
-shglm(formula, data, family = gaussian(), weights.fo = NULL, start = NULL, 
+shglm(formula, datafun, family = gaussian(), weights.fo = NULL, start = NULL, 
       etastart = NULL, mustart = NULL, offset = NULL, maxit = 25, k = 2, 
-      chunksize = 5000, sparse = NULL, all.levels = FALSE, set.default = list(),...)
+      chunksize = 5000, sparse = NULL, all.levels = FALSE,
+      set.default = list(),...)
      
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
 Most of arguments are the same of \link[stats]{glm} or \link[biglm]{bigglm} but with some difference.     
   \item{formula}{the same of \code{glm}.}
-  \item{data}{as in \code{bigglm}, can be either a data frame or a function which uses connections. 
-       The latter case is only for \code{shglm}.}
+  \item{data}{a data frame.}
+  \item{datafun}{a function which uses connections. See the example below.}     
   \item{family}{the same of \code{glm}, but it must be specified with brackets.}
   \item{start}{the same of \code{glm}.}
   \item{weights}{the same of \code{glm}, but it must be specified as \code{data$weights}.}
@@ -90,7 +92,8 @@ Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not
   \item{df}{the degrees of freedom of the model.}
   \item{XTX}{the product X'X (weighted, if the case).}
   \item{dispersion}{the estimated dispersion parameter of the model.}
-  \item{ok}{the set of column indeces of the model matrix where the model has been fitted.}
+  \item{ok}{the set of column indeces of the model matrix where the model has
+           been fitted.}
   \item{rank}{the rank of the model matrix.}  
   \item{RSS}{the estimated residual sum of squares of the fitted model.}
   \item{aic}{the estimated Akaike Information Criterion.}
@@ -124,9 +127,10 @@ Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not
 \seealso{ \link{speedlm}, \link[biglm]{bigglm}, \link[stats]{glm} }
 \examples{
 
-# Not Run: the example may take a long time.
+\dontrun{
 # The following comparison among glm(), bigglm() and speedglm() cannot be considered rigorous 
 # and exhaustive, but it is only to give an idea of the computation time. 
+# It may take a long time.
 require(biglm)
 n<-50000
 k<-80
@@ -140,22 +144,24 @@ system.time(m1 <- glm(fo,data=da,family=Gamma(log)))
 system.time(m2 <- bigglm(fo,data=da,family=Gamma(log)))
 system.time(m3 <- speedglm(fo,data=da,family=Gamma(log)))
 
-# You may also try speedglm when R is linked against an optimized BLAS, otherwise try to run the following
-# function. In some computers, it is faster for large data sets.
+# You may also try speedglm when R is linked against an optimized BLAS,
+# otherwise try to run the following function. In some computers, it is
+# faster for large data sets.
 system.time(m4 <- speedglm(fo,data=da,family=Gamma(log),set.default=list(row.chunk=1000)))
-
+}
 ##################
-
-## The function from the bigglm's help page 
- make.data<-function(urlname, chunksize,...){
-      conn<-NULL
+\dontrun{
+## An example of function using a connection to an out-memory file  
+## This is a slightly modified version of the function from the bigglm's help page 
+ make.data<-function(filename, chunksize,...){       
+     conn<-NULL
      function(reset=FALSE){
      if(reset){
        if(!is.null(conn)) close(conn)
-       conn<<-url(urlname,open="r")
+       conn<<-file(filename,open="r")
      } else{
        rval<-read.table(conn, nrows=chunksize,...)
-       if (nrow(rval)==0) {
+       if ((nrow(rval)==0)) {
             close(conn)
             conn<<-NULL
             rval<-NULL
@@ -165,16 +171,30 @@ system.time(m4 <- speedglm(fo,data=da,family=Gamma(log),set.default=list(row.chu
   }
 }
 
-require(biglm)
-da<-make.data("http://dssm.unipa.it/enea/data1.txt",
-        chunksize=50,col.names=c("y","fat1","x1","x2"))
-        
+
+# data1 is a small toy dataset
+data(data1)
+write.table(data1,"data1.txt",row.names=FALSE,col.names=FALSE)
+rm(data1) 
+
+da<-make.data("data1.txt",chunksize=50,col.names=c("y","fat1","x1","x2"))
+
+# Caution! make sure to close the connection once you have run command #1
+da(reset=T) #1: opens the connection to "data1.txt"
+da(reset=F) #2: reads the first 50 rows (out of 100) of the dataset
+da(reset=F) #3: reads the second 50 rows (out of 100) of the dataset
+da(reset=F) #4: is NULL: this latter command closes the connection
+
+
+require(biglm)        
 # fat1 is a factor with four levels                                    
-b1<-shglm(y~factor(fat1)+x1,weights=~I(x2^2),data=da,family=Gamma(log))
+b1<-shglm(y~factor(fat1)+x1,weights=~I(x2^2),datafun=da,family=Gamma(log))
 b2<-bigglm(y~factor(fat1)+x1,weights=~I(x2^2),data=da,family=Gamma(log))
 summary(b1) 
 summary(b2) 
 
+file.remove("data1.txt")
+}
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

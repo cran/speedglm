@@ -1,7 +1,4 @@
-
-`summary.speedlm` <-
-function(object,correlation=FALSE,...)
-{
+summary.speedlm <- function(object,correlation=FALSE,...){
   if (!inherits(object, "speedlm")) stop("object must be an object of class speedlm")
   z <- object 
   n <- if (is.null(z$weights)) z$n.obs else z$n.obs - z$zero.w
@@ -51,13 +48,10 @@ function(object,correlation=FALSE,...)
   return(ans)
 }
 
-`coef.speedlm` <-
-function(object,...)  object$coefficients
+coef.speedlm <- function(object,...)  object$coefficients
 
 
-`vcov.speedlm` <-
-function(object,...)
-{
+vcov.speedlm <- function(object,...){
   z <- object
   var_res <- z$RSS/z$df.residual
   rval<- var_res * solve(z$XTX)
@@ -98,8 +92,7 @@ AIC.speedlm<-function (object,...,k = 2){
 }
 
 
-`print.summary.speedlm` <-
-function(x,digits=max(3,getOption("digits")-3),...){
+print.summary.speedlm <- function(x,digits=max(3,getOption("digits")-3),...){
 
   x$coefficients$coef <- if (any(abs(na.omit(x$coefficients$coef))<0.0001))
                            format(x$coefficients$coef,scientific=TRUE,
@@ -107,7 +100,7 @@ function(x,digits=max(3,getOption("digits")-3),...){
   x$coefficients$se <- if (any(na.omit(x$coefficients$se)<0.0001))
                          format(x$coefficients$se,scientific=TRUE,digits=4) else
                          round(x$coefficients$se,digits=6)
-  x$coefficients$t <- round(x$coefficients$t,digit=3)
+  x$coefficients$t <- round(x$coefficients$t,digits=3)
   x$coefficients$p.value <- if (any(na.omit(x$coefficients$p.value)<0.0001))
                               format(x$coefficients$p.value,scientific=TRUE,
                               digits=4) else round(x$coefficients$p.value,
@@ -138,17 +131,14 @@ function(x,digits=max(3,getOption("digits")-3),...){
   }
 }
 
-`print.speedlm` <-
-function(x,digits = max(3, getOption("digits") - 3),...)
-{
+print.speedlm <- function(x,digits = max(3, getOption("digits") - 3),...){
   cat("Linear Regression Model of class 'speedlm':\n")
   if (!is.null(x$call)) cat("\nCall: ", deparse(x$call), "\n\n")
   if (length(x$coef)) {
         cat("Coefficients:\n")
         print.default(format(x$coefficients, digits = digits), print.gap = 2,
             quote = FALSE)
-    }
-    else cat("No coefficients\n")
+    } else cat("No coefficients\n")
     cat("\n")
     invisible(x)
 }

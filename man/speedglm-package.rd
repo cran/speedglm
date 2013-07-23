@@ -12,8 +12,8 @@ of R memory, the fitting is made by an updating algorithm.}
 \tabular{ll}{
 Package: \tab speedglm\cr
 Type: \tab Package\cr
-Version: \tab 1.0\cr
-Date: \tab 2009-09-10\cr
+Version: \tab 0.2\cr
+Date: \tab 2013-07-23\cr
 Depends: \tab Matrix\cr
 License: \tab GPL\cr
 LazyLoad: \tab yes\cr
@@ -21,9 +21,9 @@ LazyLoad: \tab yes\cr
 
 }
 \author{
-Marco ENEA  
+Marco Enea  
 
-Maintainer: Marco ENEA enea@dssm.unipa.it (thanks to Vito M.R. Muggeo for his helpful advice) 
+Maintainer: Marco Enea <marco.enea@unipa.it> 
 
 }
 

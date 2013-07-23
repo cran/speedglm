@@ -1,7 +1,5 @@
-`speedlm` <-
-function(formula,data,weights=NULL,offset=NULL,sparse=NULL,
-                    set.default=list(),...)
-{  
+speedlm <- function(formula,data,weights=NULL,offset=NULL,sparse=NULL,
+                    set.default=list(),...){
   call <- match.call() 
   tf <- terms(formula)
   M  <- model.frame(tf,data)
@@ -39,10 +37,9 @@ function(formula,data,weights=NULL,offset=NULL,sparse=NULL,
   rval 
 }
 
-`update.speedlm` <-
-function (object, data, weights = NULL, offset = NULL, sparse = NULL, 
-    all.levels = FALSE, set.default = list(), ...) 
-{
+update.speedlm <- function(object, data, weights = NULL, offset = NULL,
+                            sparse = NULL, all.levels = FALSE, 
+                            set.default = list(), ...){
     if (!inherits(object, "speedlm")) 
         stop("object must be an objectect of class speedlm")
     call <- match.call()
@@ -76,9 +73,8 @@ function (object, data, weights = NULL, offset = NULL, sparse = NULL,
               flevels <- object$levels
             }
 
-    pw <- if (is.null(weights)) 
-        weights
-    else prod(weights[weights != 0]) + object$pw
+    pw <- if (is.null(weights)) weights else 
+        prod(weights[weights != 0]) + object$pw
     w <- weights
     zero.w <- sum(w == 0)
     offset <- model.offset(M)
@@ -89,8 +85,7 @@ function (object, data, weights = NULL, offset = NULL, sparse = NULL,
     if (!is.null(w)) {
         if (object$rank == ncol(X)) {
             XTX <- if (sparse) 
-                crossprod(sqrt(w) * X)
-            else cp(X, w, set$rowchunk)
+                crossprod(sqrt(w) * X) else cp(X, w, set$rowchunk)
             XTX <- as(XTX, "matrix") + object$XTX
             A <- XTX
             Xy <- as(object$Xy, "matrix") + as(crossprod(X, (w * 
@@ -98,11 +93,9 @@ function (object, data, weights = NULL, offset = NULL, sparse = NULL,
             rank <- object$rank
             ok <- 1:ncol(X)
             nvar <- object$nvar
-        }
-        else {
+        } else {
             A <- if (sparse) 
-                crossprod(sqrt(w) * X)
-            else cp(X, w, set$rowchunk)
+                crossprod(sqrt(w) * X) else cp(X, w, set$rowchunk)
             A <- as(A, "matrix")
             A[rownames(object$A), colnames(object$A)] <- A[rownames(object$A), 
                 colnames(object$A)] + object$A
@@ -124,12 +117,10 @@ function (object, data, weights = NULL, offset = NULL, sparse = NULL,
         XW1[names(object$X1X)] <- XW1[names(object$X1X)] + object$XW1
         SW <- sum(w) + object$SW
         dfr <- object$df.residual + nrow(X) - zero.w
-    }
-    else {
+    } else {
         if (object$rank == ncol(X)) {
             XTX <- if (sparse) 
-                crossprod(X)
-            else cp(X, w = NULL, set$rowchunk)
+                crossprod(X) else cp(X, w = NULL, set$rowchunk)
             XTX <- as(XTX, "matrix") + object$XTX
             A <- XTX
             Xy <- as(object$Xy, "matrix") + as(crossprod(X, y), 
@@ -137,11 +128,8 @@ function (object, data, weights = NULL, offset = NULL, sparse = NULL,
             rank <- object$rank
             ok <- 1:ncol(X)
             nvar <- object$nvar
-        }
-        else {
-            A <- if (sparse) 
-                crossprod(X)
-            else cp(X, w = NULL, set$rowchunk)
+        } else {
+            A <- if (sparse) crossprod(X) else cp(X, w = NULL, set$rowchunk)
             A <- as(A, "matrix")
             A[rownames(object$A), colnames(object$A)] <- A[rownames(object$A), 
                 colnames(object$A)] + object$A
@@ -179,10 +167,10 @@ function (object, data, weights = NULL, offset = NULL, sparse = NULL,
     rval
 }
 
-`speedlm.fit` <-
-function(y,X,intercept=FALSE,offset=NULL,row.chunk=NULL,sparselim=.9,camp=.01,
-                      eigendec=TRUE,tol.solve=.Machine$double.eps,sparse=NULL,
-                      tol.values=1e-7,tol.vectors=1e-7, method="eigen",...)
+speedlm.fit <- function(y,X,intercept=FALSE,offset=NULL,row.chunk=NULL,
+                        sparselim=.9, camp=.01, eigendec=TRUE,
+                        tol.solve=.Machine$double.eps,sparse=NULL,
+                        tol.values=1e-7,tol.vectors=1e-7, method="eigen",...)
 {
   nvar <- ncol(X)
   nobs <- nrow(X)
@@ -213,11 +201,10 @@ function(y,X,intercept=FALSE,offset=NULL,row.chunk=NULL,sparselim=.9,camp=.01,
   rval 
 }
 
-`speedlm.wfit` <-
-function(y,X,w,intercept=FALSE, offset=NULL,row.chunk=NULL,sparselim=.9,
-         camp=.01,eigendec=TRUE,tol.solve=.Machine$double.eps,sparse=NULL,
-         tol.values=1e-7,tol.vectors=1e-7, method = "eigen",...)
-{ 
+speedlm.wfit <- function(y,X,w,intercept=FALSE, offset=NULL,row.chunk=NULL,
+                         sparselim=.9,camp=.01,eigendec=TRUE,
+                         tol.solve=.Machine$double.eps,sparse=NULL,
+                         tol.values=1e-7,tol.vectors=1e-7, method = "eigen",...){ 
   if (is.null(offset)) offset <- rep(0,length(y))
   if (any(is.na(w))) stop("some weights are NA")   
   if (any(w<0)) stop("weights must not be negative")  

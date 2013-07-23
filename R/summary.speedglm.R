@@ -88,16 +88,14 @@ if (!(length(list(...)))) object$aic else {
   } 
 }
 
-`print.summary.speedglm` <-
-function(x,digits = max(3, getOption("digits") - 3),...)
+print.summary.speedglm <- function(x,digits = max(3, getOption("digits") - 3),...)
 {
   cat("Generalized Linear Model of class 'speedglm':\n")
   if (!is.null(x$call)) cat("\nCall: ", deparse(x$call), "\n\n")
   if (length(x$coef)) {
         cat("Coefficients:\n")
         print(x$coefficients)
-    }
-    else cat("No coefficients\n")
+    } else cat("No coefficients\n")
   cat("---\n")
   cat("null df: ",x$nulldf,"; null deviance: ",round(x$nulldev,digits=2),";\n",
       "residuals df: ",x$df,"; residuals deviance: ",round(x$deviance,
@@ -117,8 +115,7 @@ function(x,digits = max(3, getOption("digits") - 3),...)
   }
 }
 
-`print.speedglm` <-
-function(x,digits = max(3, getOption("digits") - 3),...)
+print.speedglm <- function(x,digits = max(3, getOption("digits") - 3),...)
 {
   cat("Generalized Linear Model of class 'speedglm':\n")
   if (!is.null(x$call)) cat("\nCall: ", deparse(x$call), "\n\n")
@@ -126,8 +123,7 @@ function(x,digits = max(3, getOption("digits") - 3),...)
         cat("Coefficients:\n")
         print.default(format(x$coefficients, digits = digits), print.gap = 2,
             quote = FALSE)
-    }
-    else cat("No coefficients\n")
+    } else cat("No coefficients\n")
     cat("\n")
     invisible(x)
 }

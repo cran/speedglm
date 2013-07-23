@@ -1,0 +1,14 @@
+*************************************
+*				  		*
+*	Changes in speedglm	  	*
+*				  		*
+*************************************
+
+
+===============
+version 0.2
+===============
+* the data1 dataset has been added to the package. This permits to run the second example in the help page of speedglm without using a connection to the URL "http://dssm.unipa.it/enea/data1.txt" which could fail.
+* argument data from shglm() changed to datafun.
+* a bug has been fixed using  print.summary.speedlm(). Now the rounding of the t statistic in the output print works correctly.
+* the author's email address has changed
