@@ -16,57 +16,70 @@ argument a function to manipulate connections.
 }
 \usage{
 ## S3 method for class 'data.frame':
-speedglm(formula, data, family = gaussian(), weights = NULL, start = NULL, 
-         etastart = NULL, mustart = NULL, offset = NULL, maxit = 25, k = 2,
-         sparse = NULL, set.default = list(), ...)
+speedglm(formula,data,family=gaussian(),weights=NULL,start=NULL,
+         etastart=NULL,mustart=NULL,offset=NULL,maxit=25, k=2, 
+         sparse=NULL,set.default=list(), trace=FALSE,
+         method=c('eigen','Cholesky','qr'), model=FALSE, y=FALSE, 
+         fitted=FALSE,...)
 
 ## S3 method for class 'matrix':       
-speedglm.wfit(y, X, intercept = TRUE, weights = NULL, row.chunk = NULL,
-              family = gaussian(), start = NULL, etastart = NULL,
-              mustart = NULL, offset = NULL, acc = 1e-08, maxit = 25, k = 2,
-              sparselim = .9, camp = .01, eigendec = TRUE, tol.values = 1e-7,
-              tol.vectors = 1e-7, tol.solve = .Machine$double.eps,
-              method = "eigen", sparse = NULL,...)
+speedglm.wfit(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
+              family=gaussian(), start=NULL, etastart=NULL,
+              mustart=NULL, offset=NULL, acc=1e-08, maxit=25, k=2,
+              sparselim=.9,camp=.01, eigendec=TRUE, tol.values=1e-7,
+              tol.vectors=1e-7, tol.solve=.Machine$double.eps,
+              sparse=NULL,method = c('eigen','Cholesky','qr'), 
+              trace=FALSE,...)
               
 ## S3 method for class 'function':              
 shglm(formula, datafun, family = gaussian(), weights.fo = NULL, start = NULL, 
       etastart = NULL, mustart = NULL, offset = NULL, maxit = 25, k = 2, 
-      chunksize = 5000, sparse = NULL, all.levels = FALSE,
+      chunksize = 5000, sparse = NULL, trace = FALSE, all.levels = FALSE,
       set.default = list(),...)
      
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
-Most of arguments are the same of \link[stats]{glm} or \link[biglm]{bigglm} but with some difference.     
+Most of arguments are the same of \link[stats]{glm} or \link[biglm]{bigglm} 
+but with some difference.     
   \item{formula}{the same of \code{glm}.}
   \item{data}{a data frame.}
   \item{datafun}{a function which uses connections. See the example below.}     
   \item{family}{the same of \code{glm}, but it must be specified with brackets.}
   \item{start}{the same of \code{glm}.}
   \item{weights}{the same of \code{glm}, but it must be specified as \code{data$weights}.}
-  \item{weights.fo}{weights for the response. It must be specified as a formula (see the example below).}
+  \item{weights.fo}{weights for the response. It must be specified as a formula 
+  (see the example below).}
   \item{etastart}{the same of \code{glm}.}
   \item{mustart}{the same of \code{glm}.}
   \item{offset}{the same of \code{glm}.}
   \item{intercept}{the same of \code{glm}.}
   \item{X}{the same of \code{x} in \code{glm.fit}.}
-  \item{y}{the same of \code{glm}.}
+  \item{y}{the same of \code{glm} and \code{glm.fit}.}
   \item{maxit}{the same of \code{glm}.}
-  \item{k}{numeric, the penalty per parameter to be used; the default k = 2 is the classical AIC.}
-  \item{sparse}{logical. Is the model matrix sparse? By default is NULL, so a quickly sample survey will be made.}
-  \item{chunksize}{an integer indicates the number of rows of the data file to read at time.}
+  \item{k}{numeric, the penalty per parameter to be used; the default k = 2 is
+  the classical AIC.}
+  \item{trace}{logical. Do you want to be informed about the model estimation 
+  progress?}
+  \item{sparse}{logical. Is the model matrix sparse? By default is NULL, so a 
+  quickly sample survey will be made.}
+  \item{chunksize}{an integer indicates the number of rows of the data file to 
+  read at time.}
   \item{all.levels}{logical, are all factor's levels present in each data chunk?}
   \item{set.default}{a list in which to specify the below parameters.}
   \item{sparselim}{a real in the interval [0, 1]. It indicates the minimal 
   proportion of zeroes in the data matrix X in order to consider X as sparse.}   
   \item{camp}{see the function \link{is.sparse}.}
-  \item{eigendec}{logical. Do you want to check the rank of X? You may set it to false if you are sure that X is full rank.}  
+  \item{eigendec}{logical. Do you want to check the rank of X? You may set it to 
+  false if you are sure that X is full rank.}  
   \item{row.chunk}{an integer, see the function \link{cp} for details.}
   \item{acc}{tolerance to be used for the estimation.} 
   \item{tol.solve}{see the function \link{solve}.}
   \item{tol.values}{see the function \link{control}.}
   \item{tol.vectors}{see the function \link{control}.}
-  \item{method}{see the function \link{control}.}  
+  \item{method}{the chosen method to detect for singulatity.}  
+  \item{model}{logical. If TRUE the model frame will be returned. }  
+  \item{fitted}{logical. If TRUE the fitted values will be returned.}  
   \item{\dots}{further optional arguments.}
   
 }
@@ -76,10 +89,12 @@ factors. Since during the IWLS estimation \code{shglm} uses repeated accesses to
 into the hard disk, the estimation time could be very long. 
 Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not use 
  the QR decomposition, but directly solve the equations in the form of Iterative(-ly) (Re-)Weighted Least Squares (IWLS). 
- The memory size of an object of class 'speedglm' is \eqn{O(p^2)}, where \eqn{p} is the number of covariates. If an optimized BLAS 
+The memory size of an object of class 'speedglm' is \eqn{O(p^2)}, where \eqn{p} is the number of covariates, unless one or more of argument \code{model}, \code{y} and \code{fitted} are set to TRUE. If an optimized BLAS 
  is not installed, an attempt to speed up calculations might be done by setting \code{row.chunk} 
  to some value, usually less than 1000, in \code{set.default}. See the function \link{cp} for details.\cr
  If the model matrix is (very) sparse, the package \code{Matrix} could be used.
+ Note that if method 'qr' is chosen, then the qr decomposition will not be applied on matrix X, as in \code{lm}, 
+ but on X'WX.   
 }
 \value{
   \item{coefficients}{the estimated coefficients.}
@@ -106,8 +121,11 @@ Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not
   \item{intercept}{a logical value which indicates if an intercept has been used.}
   \item{terms}{the terms object used.}
   \item{call}{the matched call.}
-  
+  \item{model}{Either NULL or, if \code{model} was previously set to TRUE, the model frame. }  
+  \item{y}{Either NULL or, if \code{y} was previously set to TRUE, the response variable. }  
+  \item{linear.predictors}{Either NULL or, if \code{fitted} was previously set to TRUE, the fitted values. }    
 }
+
 \references{Enea, M. (2009) Fitting Linear Models and Generalized Linear Models with large data sets in R.
             In \emph{book of short papers, conference on ``Statistical Methods for the analysis of large data-sets'',
             Italian Statistical Society}, Chieti-Pescara, 23-25 September 2009, 411-414.\cr
@@ -119,7 +137,7 @@ Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not
             \url{http://CRAN.R-project.org/package=biglm}.
             }
             
-\author{ Marco ENEA }
+\author{ Marco Enea. Ronen Meiri contributed with method 'qr'}
 \note{All the above functions make an object of class 'speedglm'.\cr
 In the current package version, arguments \code{start}, \code{mustart} and \code{etastart} of function \code{shglm} have been disabled. 
 These will be restored in future.}

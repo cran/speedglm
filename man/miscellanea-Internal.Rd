@@ -13,7 +13,7 @@ Utility functions for least squares estimation in large data sets.
 }
 \usage{
 control(B, symmetric = TRUE, tol.values = 1e-7, tol.vectors = 1e-7,
-       out.B = TRUE, method = "eigen")
+       out.B = TRUE, method = c("eigen", "Cholesky"))
 cp(X, w = NULL, row.chunk = NULL, sparse = FALSE)
 is.sparse(X, sparselim = .9, camp = .05)               
 }

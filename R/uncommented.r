@@ -30,11 +30,22 @@ aic.poisson <- function(y, n, mu, wt, dev)
 -2 * sum(dpois(y, mu, log = TRUE) * wt)
 
 aic.gaussian <- function(y, n, mu, wt, dev){
-    nobs <- length(y)
-    nobs * (log(dev/nobs * 2 * pi) + 1) - sum(log(wt)) # + 2
+    n.obs <- length(y)
+    n.obs * (log(dev/n.obs * 2 * pi) + 1) - sum(log(wt)) # + 2
 }
 
 
+safe_pchisq <- function (q, df, ...) #from stats
+{
+  df[df <= 0] <- NA
+  pchisq(q = q, df = df, ...)
+}
+
+safe_pf <- function (q, df1, ...) #from stats
+{
+  df1[df1 <= 0] <- NA
+  pf(q = q, df1 = df1, ...)
+}
 
 
 aic.shglm <- function(family,y, n, mu, wt, dev){

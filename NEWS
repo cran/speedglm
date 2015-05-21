@@ -6,15 +6,35 @@
 
 
 ===============
-version 0.2
+version 0.3
 ===============
-* the data1 dataset has been added to the package. This permits to run the second example in the help page of speedglm without using a connection to the URL "http://dssm.unipa.it/enea/data1.txt" which could fail.
-* argument data from shglm() changed to datafun.
-* a bug has been fixed using  print.summary.speedlm(). Now the rounding of the t statistic in the output print works correctly.
-* the author's email address has changed
+* speedglm(), speedglm.wfit() and shglm(): new argument "trace";
+* speedlm() and speedglm(): new arguments "model=FALSE", "y=FALSE", and "fitted=FALSE". 
+  By setting them to TRUE, the speedlm/speedglm object will return the model frame, 
+  the response and the fitted values, respectively. 
+* new wrappers predict.speedlm() and predict.speedglm() with reduced functionalities by Tomer Kalimi and Marco Enea; 
+* new wrappers extractAIC(), drop1() and add1() (for "speedlm" objects only), by Ronen Meiri: 
+  now it is possible to use function stepAIC(), from the package MASS, like for an "lm" object. 
+* speedlm() and speedglm(): method="qr", by Ronen Meiri, has been added to the already existing "eigen" and "Cholesky" options. However the method does not act on matrix X directly, but on X'WX;
+* update.speedlm(): now this is a wrapper calling either updateWithMoreData(), the new name of the old function for updating estimates with additional data, or update.default() to specify a new model formula/data (by Marco Enea and Ronen Meiri)
+* the mantainer"s email address has changed to emarco76@libero.it.
+* bug fixing: a bug concerning the speedlm"s NULL model, as well as the summary, has been fixed;
+* bug fixing: a bug concerning a wrong row-chunk dimension in shglm has been fixed. 
+* Acknowledgements: the author is grateful to all those users who have reported bugs.
+
+
 
 ===============
 version 0.2-1.0
 ===============
 * a bug concerning the use of argument start in speedglm with sparse matrices has been fixed. Thanks to Micheal Isaiah Love for reporting the problem.
 * a bug concerning arguments start, mustart and etastart in function shglm  has been not fixed yet. Those arguments are currently disabled. These will be fixed (I hope) in the next versions.
+
+
+===============
+version 0.2
+===============
+* the data1 dataset has been added to the package. This permits to run the second example in the help page of speedglm without using a connection to the URL "http://dssm.unipa.it/enea/data1.txt" which could fail.
+* argument data from shglm() changed to datafun.
+* a bug has been fixed using  print.summary.speedlm(). Now the rounding of the t statistic in the output print works correctly.
+* the author's email address has changed

@@ -1,15 +1,20 @@
-import(Matrix)
+import(Matrix, MASS)
+importFrom(stats,nobs,family)
 
 export(speedglm, speedlm, speedlm.fit, speedlm.wfit, update.speedlm,
-       shglm, speedglm.wfit, is.sparse, cp, control)
+       updateWithMoreData, shglm, speedglm.wfit, is.sparse, cp, control)
 
 S3method(summary,speedglm)
 S3method(print,speedglm)
 S3method(print,summary.speedglm)
 S3method(AIC,speedglm)
+S3method(extractAIC,speedlm)
 S3method(coef,speedglm)
 S3method(vcov,speedglm)
 S3method(logLik,speedglm)
+S3method(fitted,speedglm)
+S3method(fitted,speedlm)
+S3method(family,speedglm)
 S3method(summary,speedlm)
 S3method(print,speedlm)
 S3method(print,summary.speedlm)
@@ -19,3 +24,11 @@ S3method(coef,speedlm)
 S3method(vcov,speedlm)
 S3method(logLik,speedlm)
 S3method(update,speedlm)
+S3method(add1,speedlm)
+S3method(drop1,speedlm)
+S3method(predict,speedlm)
+S3method(predict,speedglm)
+S3method(nobs,speedlm)
+
+
+

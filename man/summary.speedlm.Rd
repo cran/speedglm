@@ -17,7 +17,6 @@
 \method{vcov}{speedlm}(object,...)
 \method{logLik}{speedlm}(object,...)
 \method{AIC}{speedlm}(object,...,k = 2)
-
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
