@@ -79,7 +79,28 @@ print.summary.speedglm <- function(x,digits = max(3, getOption("digits") - 3),..
   if (!is.null(x$call)) cat("\nCall: ", deparse(x$call), "\n\n")
   if (length(x$coef)) {
     cat("Coefficients:\n")
-    print(x$coefficients)
+  cat(" ------------------------------------------------------------------", "\n")
+  sig <- function(z) {
+    if (z < 0.001) 
+      "***"
+    else if (z < 0.01) 
+      "** "
+    else if (z < 0.05) 
+      "*  "
+    else if (z < 0.1) 
+      ".  "
+    else "   "
+  }
+  sig.1 <- sapply(as.numeric(as.character(x$coefficients$"Pr(>|t|)")), sig)
+  est.1 <- cbind(format(x$coefficients, digits = digits), sig.1)
+  colnames(est.1)[ncol(est.1)] <- ""
+  print(est.1)
+  cat("\n")
+  cat("-------------------------------------------------------------------", 
+      "\n")
+  cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", 
+      "\n")
+  cat("\n")  
   } else cat("No coefficients\n")
   cat("---\n")
   cat("null df: ",x$nulldf,"; null deviance: ",round(x$nulldev,digits=2),";\n",
@@ -127,4 +148,14 @@ AIC.speedglm <- function(object,...) {
     val
   } 
 }
+
+extractAIC.speedglm<-function(fit, scale=0, k=2,...) 
+{
+  n <- fit$n
+  edf <- n - fit$df
+  aic <- fit$aic
+  c(edf, aic +  (k - 2) * edf)
+}
+
+
 

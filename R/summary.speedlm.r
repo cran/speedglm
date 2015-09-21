@@ -77,7 +77,27 @@ print.summary.speedlm <- function(x,digits=max(3,getOption("digits")-3),...){
   if (!is.null(x$call)) cat("\nCall: ", deparse(x$call), "\n\n")  
   if (length(x$coef)) {
     cat("Coefficients:\n")
-    print(x$coefficients)
+    cat(" ------------------------------------------------------------------", "\n")
+    sig <- function(z) {
+      if (z < 0.001) 
+        "***"
+      else if (z < 0.01) 
+        "** "
+      else if (z < 0.05) 
+        "*  "
+      else if (z < 0.1) 
+        ".  "
+      else "   "
+    }
+    sig.1 <- sapply(x$coefficients$p.value, sig)
+    est.1 <- cbind(format(x$coefficients, digits = digits), sig.1)
+    colnames(est.1)[ncol(est.1)] <- ""
+    print(est.1)
+    cat("\n")
+    cat("-------------------------------------------------------------------", 
+        "\n")
+    cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", 
+        "\n") 
   } else cat("No coefficients\n")
   cat("---\n")
   if (x$intercept)

@@ -17,7 +17,7 @@ optimized BLAS, such as ATLAS.
 # S3 method of class 'data.frame'
 speedlm(formula, data, weights = NULL, offset = NULL, sparse = NULL, 
         set.default = list(), method=c('eigen','Cholesky','qr'), 
-        model = FALSE, y = FALSE, fitted = FALSE, ...)
+        model = FALSE, y = FALSE, fitted = FALSE, subset=NULL, ...)
 
 # S3 method of class 'matrix'
 speedlm.fit(y, X, intercept = FALSE, offset = NULL, row.chunk = NULL, 
@@ -31,11 +31,12 @@ speedlm.wfit(y, X, w, intercept = FALSE, offset = NULL, row.chunk = NULL,
              tol.vectors = 1e-07, method=c('eigen','Cholesky','qr'), ...)
                       
 # S3 method of class 'speedlm' (object) and 'data.frame' (data)                    
-\method{update}{speedlm}(object, formula, data, add=TRUE, evaluate=FALSE, ...)
+\method{update}{speedlm}(object, formula, data, add=TRUE, evaluate=FALSE, 
+                         subset=NULL,...)
 
 # S3 method of class 'speedlm' (object) and 'data.frame' (data)                    
 updateWithMoreData(object, data, weights = NULL, offset = NULL, sparse = NULL, 
-                   all.levels = FALSE, set.default = list(), ...)
+                   all.levels = FALSE, set.default = list(), subset=NULL, ...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -70,6 +71,7 @@ some difference.
         chunk? If so, set \code{all.levels} to true to speed up the fitting.}
   \item{model}{logical. Should the model frame be returned?}  
   \item{fitted}{logical. Should the fitted values be returned? }    
+  \item{subset}{the same of function \code{lm}} 
   \item{add}{logical. Are additional data coming from a new chunk provided?}
   \item{evaluate}{logical. If true evaluate the new call else return the call.}
   \item{\dots}{further optional arguments.}
@@ -184,7 +186,7 @@ summary(m2)
   }  
   all.equal(coef(m1),coef(m3))  
   file.remove("da.txt")
-  }
+}
 
 }
 

@@ -7,7 +7,7 @@ speedlm.fit <- function(y, X, intercept = FALSE, offset = NULL, row.chunk = NULL
   nvar <- ncol(X)
   nobs <- nrow(X)
   if (is.null(offset)) 
-    offset <- rep(0, nobs)
+  offset <- rep(0, nobs)
   colnam <- colnames(X)
   if (is.null(sparse)) sparse <- is.sparse(X = X, sparselim, camp)
   if (sparse) X <- as(X, "dgCMatrix")
@@ -61,7 +61,7 @@ speedlm.fit <- function(y, X, intercept = FALSE, offset = NULL, row.chunk = NULL
          },
          stop('speedlm.fit: Unknown method value')
   )
-  names(coefficients)<-colnames(X)
+  names(coefficients) <- colnames(X)
   dfr <- nrow(X) - ris$rank
   rval <- list(coefficients = coefficients, coef = coef, df.residual = dfr, 
                XTX = as(ris$XTX, "matrix"), Xy = Xy, nobs = nrow(X), 
@@ -169,21 +169,26 @@ speedlm.wfit <- function(y, X, w, intercept = FALSE, offset = NULL, row.chunk = 
 
 
 speedlm <- function(formula, data, weights = NULL, offset = NULL, sparse = NULL, 
-                    set.default = list(), method=c('eigen','Cholesky','qr'), 
-                    model = FALSE, y = FALSE, fitted = FALSE, ...) 
+                  set.default = list(), method = c('eigen','Cholesky','qr'), model = FALSE,  
+                  y = FALSE, fitted = FALSE, subset = NULL,...) 
 {
-  call <- match.call()
   target <- y
-  tf <- terms(formula)
-  M <- model.frame(tf, data)
+  call <- match.call()
+  M <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "data", "subset"), names(M), 0L)
+  M <- M[c(1L, m)]
+  M$drop.unused.levels <- TRUE
+  M[[1L]] <- quote(stats::model.frame)
+  M <- eval(M, parent.frame())
   y <- M[[1]]
+  tf <- terms(formula, data=data)
   X <- model.matrix(tf, M)
   offset <- model.offset(M)
   if (is.null(offset)) 
     offset <- rep(0, length(y))
   set <- list(sparselim = 0.9, camp = 0.01, eigendec = TRUE, 
               row.chunk = NULL, tol.solve = .Machine$double.eps, tol.values = 1e-07, 
-              tol.vectors = 1e-07, method = match.arg(method))
+              tol.vectors = 1e-07, method = method)
   nmsC <- names(set)
   set[(namc <- names(set.default))] <- set.default
   if (length(noNms <- namc[!namc %in% nmsC]) > 0) 
@@ -202,41 +207,54 @@ speedlm <- function(formula, data, weights = NULL, offset = NULL, sparse = NULL,
                                                                                                 "intercept"))
   rval$terms <- tf
   rval$call <- call
-  
-  if (ncol(M)>1){
+  if (ncol(M)>1) {
     for (i in 2:ncol(M)) {
-      if (is.factor(M[,i]))     
-        eval(parse(text=paste("rval$levels$'",names(M)[i],"'","<-levels(M[,i])",
-                              sep="")))       
+      if (is.factor(M[, i])) 
+        eval(parse(text = paste("rval$levels$'", names(M)[i], 
+                                "'", "<-levels(M[,i])", sep = "")))
     }
-  }  
-  
+  }
   if(model) rval$model <- M
   if(target) rval$y <- y
   class(rval) <- "speedlm"
-  if(fitted) rval$fitted.values=predict.speedlm(rval,data)
+  if(fitted) rval$fitted.values <- predict.speedlm(rval,M) 
   rval
 }
 
-update.speedlm <- function(object, formula, data, add=TRUE, evaluate=FALSE, ...) {
+formula.speedlm <- function (x, ...) 
+{
+    form <- formula(x$terms)
+    environment(form) <- environment(x$formula)
+    form
+}
+
+update.speedlm <- function(object, formula, data, add=TRUE, evaluate=FALSE, 
+                           subset=NULL, ...) {
   if (!inherits(object, "speedlm")) 
     stop("object must be of class speedlm")
   if ((!missing(formula))&(!missing(data))&(add)) 
     stop('cannot specify a formula while adding new data')
-  if ((!missing(data))&(add)) updateWithMoreData(object, data,...) else{
+  if ((!missing(data))&(add)) updateWithMoreData(object, data, subset=subset,...) else{
     if (missing(data)) update.default(object, formula, evaluate=evaluate) else 
-      update.default(object, formula, data=data, evaluate=evaluate, ...)
+      update.default(object, formula, data=data, evaluate=evaluate,subset=subset, ...)
   }  
 }
 
 updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
                                sparse = NULL, all.levels = FALSE, 
-                               set.default = list(), ...){
+                               set.default = list(), subset=NULL,...){
   if (!inherits(object, "speedlm")) 
     stop("object must be of class speedlm")
   if (is.null(call <- getCall(object))) 
     stop("need an object with call component")
-  M <- model.frame(object$terms, data)
+  M <- match.call(expand.dots = F)
+  formula <- as.formula(object$call[[2]])
+  M$formula <- formula 
+  m <- match(c("formula", "data", "subset"), names(M), 0L)
+  M <- M[c(1L, m)]
+  M$drop.unused.levels <- TRUE
+  M[[1L]] <- quote(stats::model.frame)
+  M <- eval(M, parent.frame())
   y <- M[[1]]    
   set <- list(sparselim = 0.9, camp = 0.01, eigendec = TRUE, 
               row.chunk = NULL, tol.solve = .Machine$double.eps, tol.values = 1e-07, 
@@ -255,16 +273,21 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
       eval(parse(text = paste("flevels$'", names(M)[fa[i]],
                               "'", "<-levels(M[,fa[i]])", sep = "")))
       a <- c(object$levels[[j]][!(object$levels[[j]] %in% flevels[[j]])], flevels[[j]])
-      flevels[[j]] <- sort(order(a))
+      flevels[[j]] <- a
     }
-    M <- model.frame(object$terms, data, xlev = flevels)
-    X <- model.matrix(object$terms, M, xlev = flevels)
-    object$levels <- flevels
+    if (!is.null(subset)){
+      M <- model.frame(formula, data, subset=subset, drop.unused.levels=T,xlev = flevels)
+      X <- model.matrix(formula, M)
+      object$levels <- flevels
+   } else {
+     M <- model.frame(formula, data, xlev = flevels)
+     X <- model.matrix(formula, M, xlev = flevels)
+     object$levels <- flevels
+   }
   } else {
     X <- model.matrix(object$terms, M)
     flevels <- object$levels
   }
-  
   pw <- if (is.null(weights)) weights else 
     prod(weights[weights != 0]) + object$pw
   w <- weights
@@ -304,6 +327,7 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
     names(X1X) <- colnam
     X1X[names(object$X1X)] <- X1X[names(object$X1X)] + object$X1X
     XW1 <- crossprod(w, X)
+    names(XW1) <- colnam
     XW1[names(object$X1X)] <- XW1[names(object$X1X)] + object$XW1
     SW <- sum(w) + object$SW
     dfr <- object$df.residual + nrow(X) - zero.w
@@ -320,6 +344,7 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
     } else {
       A <- if (sparse) crossprod(X) else cp(X, w = NULL, set$rowchunk)
       A <- as(A, "matrix")
+
       A[rownames(object$A), colnames(object$A)] <- A[rownames(object$A), 
                                                      colnames(object$A)] + object$A
       ris <- control(A, , set$tol.values, set$tol.vectors,,set$method)

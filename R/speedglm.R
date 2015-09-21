@@ -1,4 +1,3 @@
-
 speedglm <- function(formula,data,family=gaussian(),weights=NULL,start=NULL,
                      etastart=NULL,mustart=NULL,offset=NULL,maxit=25, k=2, 
                      sparse=NULL,set.default=list(), trace=FALSE,
@@ -6,9 +5,14 @@ speedglm <- function(formula,data,family=gaussian(),weights=NULL,start=NULL,
                      fitted=FALSE,...){
   call <- match.call()
   target <- y
-  tf <- terms(formula)
-  M  <- model.frame(tf,data)
+  M <- match.call(expand.dots = FALSE)
+  m <- match(c("formula", "data", "subset"), names(M), 0L)
+  M <- M[c(1L, m)]
+  M$drop.unused.levels <- TRUE
+  M[[1L]] <- quote(stats::model.frame)
+  M <- eval(M, parent.frame())
   y  <- M[[1]] 
+  tf <- terms(formula,data=data)
   X  <- model.matrix(tf,M)
   offset <- model.offset(M)
   intercept <- attributes(tf)$intercept    
@@ -49,7 +53,8 @@ speedglm.wfit <- function(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
   if (missing(y)) stop("Argument y is missing")
   if (missing(X)) stop("Argument X is missing") 
   if (is.null(offset)) offset <- rep.int(0, nobs)  
-  if (is.null(weights)) weights <- rep(1, nobs)   
+  if (is.null(weights)) weights <- rep(1, nobs)  
+  col.names <- dimnames(X)[[2]]
   method <- match.arg(method)
   fam  <- family$family
   link <- family$link  
@@ -134,7 +139,7 @@ speedglm.wfit <- function(y, X, intercept=TRUE, weights=NULL,row.chunk=NULL,
     start<- as(start,"numeric")
     coefficients[ok] <- start
   }
-  names(coefficients) <- dimnames(X)[[2]]
+  names(coefficients) <- col.names
   rval <- list("coefficients"=coefficients,"logLik"=ll.nuovo,"iter"=iter,
                "tol"= tol,"family"=family,"link"=link,"df"=dfr,"XTX"=XTX,
                "dispersion"=dispersion,"ok"=ok,"rank"=rank,"RSS"=RSS, method=method,
@@ -159,7 +164,7 @@ shglm <- function(formula, datafun, family = gaussian(), weights.fo = NULL,
   dati <- datafun(reset = TRUE)
   dati <- datafun(reset = FALSE)
   call <- match.call()
-  tf <- terms(formula)
+  tf <- terms(formula, data=dati)
   M <- model.frame(tf, dati)
   y <- M[[1]]
   X <- model.matrix(tf, M)
@@ -281,7 +286,7 @@ shglm <- function(formula, datafun, family = gaussian(), weights.fo = NULL,
         beta <- if (iter == 1) start[ok] else start
         start <- solve(XTX[ok, ok], XTz[ok], tol = set$tol.solve)
         if (trace) cat("coef",start,"tol",tol,"\n")
-        tol <- max(abs(dev.prec - dev)/(abs(dev) + 0.1))
+        tol <- max(abs(dev.prec - dev)/(abs(dev) + 0.1))        
         if ((tol > set$acc) & (iter < maxit)) {
           dati <- datafun(reset = TRUE)
           dati <- datafun(reset = FALSE)
@@ -339,7 +344,7 @@ shglm <- function(formula, datafun, family = gaussian(), weights.fo = NULL,
   resdf <- n.ok - rank
   var_res <- RSS/resdf
   dispersion <- if (fam %in% c("poisson", "binomial")) 1  else var_res
-  coefficients <- rep(NA, nvar)
+  coefficients <- rep(NA, ncol(X))
   start <- as(start, "numeric")
   coefficients[ok] <- start
   names(coefficients) <- colnames(X)

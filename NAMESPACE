@@ -1,5 +1,14 @@
 import(Matrix, MASS)
 importFrom(stats,nobs,family)
+importFrom("methods", "as")
+importFrom("stats", ".checkMFClasses", "add.scope", "as.formula",
+             "dbinom", "delete.response", "dgamma", "dpois",
+             "drop.scope", "fitted", "formula", "gaussian", "getCall",
+             "model.frame", "model.matrix", "model.offset",
+             "model.response", "model.weights", "na.omit", "na.pass",
+             "napredict", "pchisq", "pf", "pnorm", "pt", "terms",
+             "update.default", "update.formula")
+
 
 export(speedglm, speedlm, speedlm.fit, speedlm.wfit, update.speedlm,
        updateWithMoreData, shglm, speedglm.wfit, is.sparse, cp, control)
@@ -9,6 +18,7 @@ S3method(print,speedglm)
 S3method(print,summary.speedglm)
 S3method(AIC,speedglm)
 S3method(extractAIC,speedlm)
+S3method(extractAIC,speedglm)
 S3method(coef,speedglm)
 S3method(vcov,speedglm)
 S3method(logLik,speedglm)

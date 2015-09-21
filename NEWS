@@ -4,6 +4,17 @@
 *				    *
 *************************************
 
+===============
+version 0.3-1
+=============== 
+* speedlm(), speedglm() and shglm(): now the functions can handle the dot "." in the model formula. Thanks to Mark Wolters.
+* speedlm() and speedglm(): if argument "data" is not provided, a search in the parent.frame environment will be done. 
+* speedlm(), update.speedlm(), updateWithMoreData() and speedglm(): new argument "subset" is provided. By Ronen Meiri and Marco Enea.
+* S3method(extractAIC,speedglm) has been included in NAMESPACE.
+* bug fixing: a bug producing a warning while using update.speedlm() with weights has been fixed.  
+* bug fixing: there were some cases of mismatch between the length of the original response variable from a speedlm object and the length of the fitted values. This bug has been fixed. 
+* bug fixing: a bug causing a coefficient name shift, in the presence of variables removed due to singularity, has been fixed for both speedglm() and shglm(). 
+* Acknowledgements: the author is grateful to all those users who have reported bugs.
 
 ===============
 version 0.3
