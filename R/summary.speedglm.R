@@ -91,7 +91,7 @@ print.summary.speedglm <- function(x,digits = max(3, getOption("digits") - 3),..
       ".  "
     else "   "
   }
-  sig.1 <- sapply(as.numeric(as.character(x$coefficients$"Pr(>|t|)")), sig)
+  sig.1 <- sapply(as.numeric(as.character(x$coefficients[, ncol(x$coefficients)])), sig)
   est.1 <- cbind(format(x$coefficients, digits = digits), sig.1)
   colnames(est.1)[ncol(est.1)] <- ""
   print(est.1)
