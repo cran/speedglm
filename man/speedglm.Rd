@@ -134,7 +134,7 @@ The memory size of an object of class 'speedglm' is \eqn{O(p^2)}, where \eqn{p} 
             \url{http://cran.rakanu.com/web/packages/Matrix/vignettes/Comparisons.pdf}\cr
             
             Lumley, T. (2009) biglm: bounded memory linear and generalized linear models. \emph{R package version 0.7}.
-            \url{http://CRAN.R-project.org/package=biglm}.
+            \url{https://CRAN.R-project.org/package=biglm}.
             }
             
 \author{ Marco Enea. Ronen Meiri contributed with method 'qr'}

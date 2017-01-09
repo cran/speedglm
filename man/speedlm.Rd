@@ -31,7 +31,7 @@ speedlm.wfit(y, X, w, intercept = FALSE, offset = NULL, row.chunk = NULL,
              tol.vectors = 1e-07, method=c('eigen','Cholesky','qr'), ...)
                       
 # S3 method of class 'speedlm' (object) and 'data.frame' (data)                    
-\method{update}{speedlm}(object, formula, data, add=TRUE, evaluate=FALSE, 
+\method{update}{speedlm}(object, formula, data, add=TRUE, evaluate=TRUE, 
                          subset=NULL,...)
 
 # S3 method of class 'speedlm' (object) and 'data.frame' (data)                    
@@ -122,7 +122,7 @@ In the most recent versions, function \code{update.speedlm} is now a wrapper to 
             \url{http://cran.rakanu.com/web/packages/Matrix/vignettes/Comparisons.pdf}\cr
             
             Lumley, T. (2009) biglm: bounded memory linear and generalized linear models.\emph{ R package version 0.7}
-            \url{http://CRAN.R-project.org/package=biglm}.
+            \url{https://CRAN.R-project.org/package=biglm}.
              }
 \author{ Marco Enea, with contribution from Ronen Meiri.}
 \note{All the above functions make an object of class 'speedlm'.}

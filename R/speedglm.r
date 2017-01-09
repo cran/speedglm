@@ -12,7 +12,8 @@ speedglm <- function(formula,data,family=gaussian(),weights=NULL,start=NULL,
   M[[1L]] <- quote(stats::model.frame)
   M <- eval(M, parent.frame())
   y  <- M[[1]] 
-  tf <- terms(formula,data=data)
+  #tf <- terms(formula,data=data)
+  tf <- attr(M,"terms")
   X  <- model.matrix(tf,M)
   offset <- model.offset(M)
   intercept <- attributes(tf)$intercept    

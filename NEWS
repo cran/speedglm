@@ -5,6 +5,18 @@
 *************************************
 
 ===============
+version 0.3-2
+=============== 
+* new wrappers drop1() and add1() also for "speedglm" objects. Now it is possible to use functions step() and stepAIC() for both speedlm and speedglm objects but objects fitted using updateWithMoreData(). Note that these functions have been poorly tested and need to be checked out more carefully.
+* new deviance.speedlm() and deviance.speedglm()
+* logLik.speedglm() and print.logLik.speedglm(): logLik now takes into account the degrees of freedom returned as attribute.
+* speedlm(): minor changes in the code to allow a more efficient calculation involving weights. Thanks to Eliav Schmulewitz for the suggestion.
+* bug fixing: A bug causing the wrong display of the summary for a speedglm object has been fixed. this bug was reported at http://stackoverflow.com/questions/34887295/r-error-using-summary-from-speedglm-package.  
+* bug fixing: A bug causing a wrong display of the asterisk in print.summary.speedlm() has beed fixed.
+* bug fixing: A bug causing an error with function update.speedlm() has been fixed.
+* Acknowledgements: the author is grateful to all those users who have reported bugs.
+
+===============
 version 0.3-1
 =============== 
 * speedlm(), speedglm() and shglm(): now the functions can handle the dot "." in the model formula. Thanks to Mark Wolters.

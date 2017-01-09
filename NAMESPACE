@@ -1,13 +1,13 @@
 import(Matrix, MASS)
 importFrom(stats,nobs,family)
-importFrom("methods", "as")
-importFrom("stats", ".checkMFClasses", "add.scope", "as.formula",
+importFrom(methods, "as")
+importFrom(stats, ".checkMFClasses", "add.scope", "as.formula",
              "dbinom", "delete.response", "dgamma", "dpois",
              "drop.scope", "fitted", "formula", "gaussian", "getCall",
              "model.frame", "model.matrix", "model.offset",
              "model.response", "model.weights", "na.omit", "na.pass",
              "napredict", "pchisq", "pf", "pnorm", "pt", "terms",
-             "update.default", "update.formula")
+             "update.default", "update.formula","extractAIC","logLik","predict")
 
 
 export(speedglm, speedlm, speedlm.fit, speedlm.wfit, update.speedlm,
@@ -16,6 +16,7 @@ export(speedglm, speedlm, speedlm.fit, speedlm.wfit, update.speedlm,
 S3method(summary,speedglm)
 S3method(print,speedglm)
 S3method(print,summary.speedglm)
+S3method(print,logLik.speedglm)
 S3method(AIC,speedglm)
 S3method(extractAIC,speedlm)
 S3method(extractAIC,speedglm)
@@ -35,10 +36,13 @@ S3method(vcov,speedlm)
 S3method(logLik,speedlm)
 S3method(update,speedlm)
 S3method(add1,speedlm)
+S3method(add1,speedglm)
 S3method(drop1,speedlm)
+S3method(drop1,speedglm)
 S3method(predict,speedlm)
 S3method(predict,speedglm)
 S3method(nobs,speedlm)
+S3method(nobs,speedglm)
 
 
 

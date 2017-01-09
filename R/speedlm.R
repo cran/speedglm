@@ -17,50 +17,46 @@ speedlm.fit <- function(y, X, intercept = FALSE, offset = NULL, row.chunk = NULL
   X1X <- colSums(X)
   names(X1X) <- colnam
   yy <- crossprod(y)
-  
-  switch(method,
-         eigen={
-           ris <- if (eigendec) control(A, , tol.values, tol.vectors, , method) else 
-                                list(XTX = A, rank = nvar, pivot = 1:nvar)
-           ris$XTX <- if (sparse) as(ris$XTX, "dgCMatrix") else 
-                                  as(ris$XTX, "matrix")	
-           ok <- ris$pivot[1:ris$rank]
-           coef<-as(solve(ris$XTX, Xy[ok]), "numeric")
-           coefficients <- rep(NA, nvar)
-           coefficients[ok] <- coef				
-           RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
-         },
-         Cholesky={
-           ris <- if (eigendec) 
-             control(A, , tol.values, tol.vectors, , method)
-           else list(XTX = A, rank = nvar, pivot = 1:nvar)
-           ris$XTX <- if (sparse) 
-             as(ris$XTX, "dgCMatrix")
-           else as(ris$XTX, "matrix")	
-           ok <- ris$pivot[1:ris$rank]
-           coef<-as(solve(ris$XTX, Xy[ok]), "numeric")
-           coefficients <- rep(NA, nvar)
-           coefficients[ok] <- coef				
-           RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
-         },
-         qr={
-           if(class(A)=='dsCMatrix') {
-             A<-as(A,'matrix')
-             Xy<-as(Xy,'matrix')
-           }
-           C_Cdqrls<-getNativeSymbolInfo('Cdqrls', PACKAGE=getLoadedDLLs()$stats)
-           ris<-c(list(XTX=A), .Call(C_Cdqrls,A, Xy, tol.values, FALSE))
-           coefficients<-ris$coefficients
-           coef<-coefficients[ris$pivot[1:ris$rank]]
-           ord <- ris$pivot
-           RSS <- yy - 2 * crossprod(coefficients, Xy[ris$pivot]) + t(coefficients[ord]) %*% ris$XTX %*% coefficients[ord]
-           ok<-ris$pivot[1:ris$rank]
-           if (ris$rank < nvar) 
-             coefficients[(ris$rank + 1L):nvar] <- NA
-           coefficients<-coefficients[ord]						 	
-         },
-         stop('speedlm.fit: Unknown method value')
-  )
+  method  <- match.arg(method)
+  if (method=="eigen"){
+    ris <- if (eigendec) control(A, , tol.values, tol.vectors, , method) else 
+              list(XTX = A, rank = nvar, pivot = 1:nvar)
+    ris$XTX <- if (sparse) as(ris$XTX, "dgCMatrix") else 
+      as(ris$XTX, "matrix")	
+    ok <- ris$pivot[1:ris$rank]
+    coef<-as(solve(ris$XTX, Xy[ok]), "numeric")
+    coefficients <- rep(NA, nvar)
+    coefficients[ok] <- coef				
+    RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
+  } else 
+  if (method=="Cholesky"){
+    ris <- if (eigendec) control(A, , tol.values, tol.vectors, , method) else 
+                         list(XTX = A, rank = nvar, pivot = 1:nvar)
+    ris$XTX <- if (sparse) as(ris$XTX, "dgCMatrix") else 
+                           as(ris$XTX, "matrix")	
+    ok <- ris$pivot[1:ris$rank]
+    coef<-as(solve(ris$XTX, Xy[ok]), "numeric")
+    coefficients <- rep(NA, nvar)
+    coefficients[ok] <- coef				
+    RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
+  } else 
+  if (method=="qr"){
+    if (class(A)=='dsCMatrix') {
+      A <- as(A,'matrix')
+      Xy <- as(Xy,'matrix')
+    }
+    C_Cdqrls <- getNativeSymbolInfo('Cdqrls', PACKAGE=getLoadedDLLs()$stats)
+    ris <- c(list(XTX=A), .Call(C_Cdqrls,A, Xy, tol.values, FALSE))
+    coefficients<-ris$coefficients
+    coef<-coefficients[ris$pivot[1:ris$rank]]
+    ord <- ris$pivot
+    RSS <- yy - 2 * crossprod(coefficients, Xy[ris$pivot]) + t(coefficients[ord]) %*% ris$XTX %*% coefficients[ord]
+    ok<-ris$pivot[1:ris$rank]
+    if (ris$rank < nvar) 
+      coefficients[(ris$rank + 1L):nvar] <- NA
+    coefficients<-coefficients[ord]						 	
+  } else
+    stop('speedlm.fit: Unknown method value')
   names(coefficients) <- colnames(X)
   dfr <- nrow(X) - ris$rank
   rval <- list(coefficients = coefficients, coef = coef, df.residual = dfr, 
@@ -90,7 +86,7 @@ speedlm.wfit <- function(y, X, w, intercept = FALSE, offset = NULL, row.chunk = 
     sparse <- is.sparse(X = X, sparselim, camp)
   if (sparse) 
     X <- as(X, "dgCMatrix")
-  pw <- prod(w[w != 0])
+  pw <- sum(log(w[w != 0]))
   sqw <- sqrt(w)
   sqwX <- sqw * X
   SW <- sum(w)
@@ -105,54 +101,47 @@ speedlm.wfit <- function(y, X, w, intercept = FALSE, offset = NULL, row.chunk = 
   Xy <- if (sparse) 
     crossprod(X, (w * y))
   else t(crossprod((w * y), X))
+  method <- match.arg(method)
+  if (method=="eigen"){
+     ris <- if (eigendec) control(A, , tol.values, tol.vectors, , method) else 
+                          list(XTX = A, rank = nvar, pivot = 1:nvar)
+     ris$XTX <- if (sparse) as(ris$XTX, "dgCMatrix") else 
+                            as(ris$XTX, "matrix")
+     ok <- ris$pivot[1:ris$rank]
+     coef <- as(solve(ris$XTX, Xy[ok]), "numeric")
+     coefficients <- rep(NA, nvar)
+     coefficients[ok] <- coef
+     RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
+   } else
+   if (method=="Cholesky") {
+     ris <- if (eigendec) control(A, , tol.values, tol.vectors, , method) else 
+       list(XTX = A, rank = nvar, pivot = 1:nvar)
+     ris$XTX <- if (sparse) as(ris$XTX, "dgCMatrix") else 
+                            as(ris$XTX, "matrix")
+     ok <- ris$pivot[1:ris$rank]
+     coef <- as(solve(ris$XTX, Xy[ok]), "numeric")
+     coefficients <- rep(NA, nvar)
+     coefficients[ok] <- coef
+     RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
+   } else
+   if (method=="qr") {
+      if (class(A)=='dsCMatrix') {
+        A <- as(A,'matrix')
+        Xy <- as(Xy,'matrix')
+      }
+      C_Cdqrls<-getNativeSymbolInfo('Cdqrls', PACKAGE=getLoadedDLLs()$stats)
+      ris<-c(list(XTX=A), .Call(C_Cdqrls,A, Xy, tol.values, FALSE))
+      coefficients<-ris$coefficients
+      coef<-coefficients[ris$pivot[1:ris$rank]]
+      ord<-order(ris$pivot)
+      RSS <- yy - 2 * crossprod(coefficients, Xy[ris$pivot]) + t(coefficients[ord]) %*% ris$XTX %*% coefficients[ord]
+      ok<-ris$pivot[1:ris$rank]
+      if (ris$rank < nvar) 
+        coefficients[(ris$rank + 1L):nvar] <- NA
+      coefficients<-coefficients[ord]						 	
+   } else
+  stop('speedlm.fit: Unknown method value')
   
-  switch(method,
-         eigen={
-           ris <- if (eigendec)
-             control(A, , tol.values, tol.vectors, , method)
-           else 
-             list(XTX = A, rank = nvar, pivot = 1:nvar)
-           ris$XTX <- if (sparse)
-             as(ris$XTX, "dgCMatrix")
-           else as(ris$XTX, "matrix")
-           ok <- ris$pivot[1:ris$rank]
-           coef <- as(solve(ris$XTX, Xy[ok]), "numeric")
-           coefficients <- rep(NA, nvar)
-           coefficients[ok] <- coef
-           RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
-         },
-         Cholesky={
-           ris <- if (eigendec)
-             control(A, , tol.values, tol.vectors, , method)
-           else 
-             list(XTX = A, rank = nvar, pivot = 1:nvar)
-           ris$XTX <- if (sparse)
-             as(ris$XTX, "dgCMatrix")
-           else as(ris$XTX, "matrix")
-           ok <- ris$pivot[1:ris$rank]
-           coef <- as(solve(ris$XTX, Xy[ok]), "numeric")
-           coefficients <- rep(NA, nvar)
-           coefficients[ok] <- coef
-           RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
-         },
-         qr={
-           if(class(A)=='dsCMatrix') {
-             A<-as(A,'matrix')
-             Xy<-as(Xy,'matrix')
-           }
-           C_Cdqrls<-getNativeSymbolInfo('Cdqrls', PACKAGE=getLoadedDLLs()$stats)
-           ris<-c(list(XTX=A), .Call(C_Cdqrls,A, Xy, tol.values, FALSE))
-           coefficients<-ris$coefficients
-           coef<-coefficients[ris$pivot[1:ris$rank]]
-           ord<-order(ris$pivot)
-           RSS <- yy - 2 * crossprod(coefficients, Xy[ris$pivot]) + t(coefficients[ord]) %*% ris$XTX %*% coefficients[ord]
-           ok<-ris$pivot[1:ris$rank]
-           if (ris$rank < nvar) 
-             coefficients[(ris$rank + 1L):nvar] <- NA
-           coefficients<-coefficients[ord]						 	
-         },
-         stop('speedlm.fit: Unknown method value')
-  )
   
   names(coefficients) <- colnames(X)
   zero.w <- sum(w == 0)
@@ -181,7 +170,7 @@ speedlm <- function(formula, data, weights = NULL, offset = NULL, sparse = NULL,
   M[[1L]] <- quote(stats::model.frame)
   M <- eval(M, parent.frame())
   y <- M[[1]]
-  tf <- terms(formula, data=data)
+  tf <- attr(M,"terms")
   X <- model.matrix(tf, M)
   offset <- model.offset(M)
   if (is.null(offset)) 
@@ -218,6 +207,7 @@ speedlm <- function(formula, data, weights = NULL, offset = NULL, sparse = NULL,
   if(target) rval$y <- y
   class(rval) <- "speedlm"
   if(fitted) rval$fitted.values <- predict.speedlm(rval,M) 
+  rval$formula <- eval(call[[2]])
   rval
 }
 
@@ -228,16 +218,19 @@ formula.speedlm <- function (x, ...)
     form
 }
 
-update.speedlm <- function(object, formula, data, add=TRUE, evaluate=FALSE, 
+update.speedlm <- function(object, formula, data, add=TRUE, evaluate=TRUE, 
                            subset=NULL, ...) {
   if (!inherits(object, "speedlm")) 
     stop("object must be of class speedlm")
   if ((!missing(formula))&(!missing(data))&(add)) 
     stop('cannot specify a formula while adding new data')
-  if ((!missing(data))&(add)) updateWithMoreData(object, data, subset=subset,...) else{
-    if (missing(data)) update.default(object, formula, evaluate=evaluate) else 
+  if ((!missing(data))&(add)) {
+    mod <- updateWithMoreData(object, data, subset, formula=formula.speedlm(object),...) }
+  else{
+   mod <- if (missing(data)) update.default(object, formula, evaluate=evaluate,...) else 
       update.default(object, formula, data=data, evaluate=evaluate,subset=subset, ...)
   }  
+  mod
 }
 
 updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
@@ -248,7 +241,7 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
   if (is.null(call <- getCall(object))) 
     stop("need an object with call component")
   M <- match.call(expand.dots = F)
-  formula <- as.formula(object$call[[2]])
+  formula <- eval(object$call[[2]])
   M$formula <- formula 
   m <- match(c("formula", "data", "subset"), names(M), 0L)
   M <- M[c(1L, m)]
@@ -289,7 +282,7 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
     flevels <- object$levels
   }
   pw <- if (is.null(weights)) weights else 
-    prod(weights[weights != 0]) + object$pw
+    sum(log(weights[weights != 0])) + object$pw
   w <- weights
   zero.w <- sum(w == 0)
   offset <- model.offset(M)
@@ -378,6 +371,6 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
   rval$terms <- object$terms
   rval$call <- call
   rval$levels <- flevels
-  class(rval) <- "speedlm"
+  class(rval) <- c("speedlm","updateWithMoreData")
   rval
 }

@@ -4,7 +4,7 @@
 \alias{vcov.speedglm}
 \alias{logLik.speedglm}
 \alias{AIC.speedglm}
-\alias{extractAIC.speedglm}
+
 
 
 %- Also NEED an '\alias' for EACH other topic documented here.
@@ -19,15 +19,11 @@
 \method{vcov}{speedglm}(object,...)
 \method{logLik}{speedglm}(object,...)
 \method{AIC}{speedglm}(object,...)
-\method{extractAIC}{speedglm}(fit, scale=0, k=2,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
   \item{object}{an object of class 'speedglm'.}
   \item{correlation}{logical. Do you want to print the correlation matrix? By default it is false.}
-  \item{fit}{A speedglm model fit}
-  \item{scale}{currently not used}
-  \item{k}{numeric specifying the 'weight' of the equivalent degrees of freedom \eqn{(=edf)} part in the AIC formula }
   \item{\dots}{further optional arguments}
 }
 \value{

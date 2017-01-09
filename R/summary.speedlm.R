@@ -11,7 +11,7 @@ summary.speedlm <- function (object, correlation = FALSE, ...)
   }
   var_res <- as.numeric(z$RSS)/rdf
   se_coef <- rep(NA, z$nvar)
-  inv <- solve.qr(qr(z$XTX))
+  inv <- solve.qr(qr(z$XTX,LAPACK=T))
   se_coef[z$ok] <- sqrt(var_res * diag(inv))
   t1 <- z$coefficients/se_coef
   p <- 2 * pt(abs(t1), df = z$df.residual, lower.tail = FALSE)
@@ -78,17 +78,21 @@ print.summary.speedlm <- function(x,digits=max(3,getOption("digits")-3),...){
   if (length(x$coef)) {
     cat("Coefficients:\n")
     cat(" ------------------------------------------------------------------", "\n")
-    sig <- function(z) {
-      if (z < 0.001) 
-        "***"
-      else if (z < 0.01) 
-        "** "
-      else if (z < 0.05) 
-        "*  "
-      else if (z < 0.1) 
-        ".  "
-      else "   "
+    sig <- function(z){
+      if (!is.na(z)){
+        z <- as.numeric(z)
+        if (z < 0.001) 
+          "***"
+        else if (z < 0.01) 
+          "** "
+        else if (z < 0.05) 
+          "*  "
+        else if (z < 0.1) 
+          ".  "
+        else "   "
+      } else "   "
     }
+    
     sig.1 <- sapply(x$coefficients$p.value, sig)
     est.1 <- cbind(format(x$coefficients, digits = digits), sig.1)
     colnames(est.1)[ncol(est.1)] <- ""
@@ -136,12 +140,12 @@ vcov.speedlm <- function(object,...){
 logLik.speedlm <- function(object,...){
     p <- object$rank
     N <- object$nobs
-    if (is.null(object$pw)) pw <- 1 else  {
+    if (is.null(object$pw)) pw <- 0 else  {
       N <- object$nobs - object$zero.w
       pw <- object$pw
     }  
     N0 <- N
-    val <- 0.5 * (log(pw) - N * (log(2 * pi) + 1 - log(N) +  log(object$RSS)))
+    val <- 0.5 * (pw - N * (log(2 * pi) + 1 - log(N) +  log(object$RSS)))
     attr(val, "nall") <- N0
     attr(val, "nobs") <- N
     attr(val, "df") <- p + 1
@@ -155,14 +159,14 @@ print.logLik.speedlm <- function(x, digits = getOption("digits"), ...) {
     invisible(x)
 }
 
-AIC.speedlm<-function (object,...,k = 2){ 
+AIC.speedlm <- function (object,...,k = 2){ 
     p <- object$rank
     N <- object$nobs
-    if (is.null(object$pw)) pw <- 1 else  {
+    if (is.null(object$pw)) pw <- 0 else  {
       N <- object$nobs - object$zero.w
       pw <- object$pw
     }  
-    val <- -(log(pw) - N * (log(2 * pi) + 1 - log(N) + log(object$RSS)))+k*(p+1)
+    val <- -(pw - N * (log(2 * pi) + 1 - log(N) + log(object$RSS)))+k*(p+1)
     val
 }
 
