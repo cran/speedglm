@@ -32,11 +32,11 @@ speedlm.wfit(y, X, w, intercept = FALSE, offset = NULL, row.chunk = NULL,
                       
 # S3 method of class 'speedlm' (object) and 'data.frame' (data)                    
 \method{update}{speedlm}(object, formula, data, add=TRUE, evaluate=TRUE, 
-                         subset=NULL,...)
+                           subset=NULL, offset=NULL, weights=NULL,...)
 
 # S3 method of class 'speedlm' (object) and 'data.frame' (data)                    
 updateWithMoreData(object, data, weights = NULL, offset = NULL, sparse = NULL, 
-                   all.levels = FALSE, set.default = list(), subset=NULL, ...)
+                   all.levels = FALSE, set.default = list(), subset=NULL,...)
 }
 %- maybe also 'usage' for other objects documented here.
 \arguments{
@@ -109,6 +109,7 @@ In the most recent versions, function \code{update.speedlm} is now a wrapper to 
   \item{model}{Either NULL or the model frame, if \code{model} was previously set to TRUE. }  
   \item{y}{Either NULL or the response variable, if \code{y} was previously set to TRUE. }  
   \item{fitted.values}{Either NULL or the fitted values, if \code{fitted} was previously set to TRUE. }    
+  \item{offset}{the model offset.}
   \item{\dots}{others values necessary to update the estimation.}
   
 }
@@ -119,7 +120,7 @@ In the most recent versions, function \code{update.speedlm} is now a wrapper to 
             Klotz, J.H. (1995) Updating Simple Linear Regression. \emph{Statistica Sinica}, \bold{5}, 399-403.\cr
             
             Bates, D. (2009) Comparing Least Square Calculations. Technical report. Available at 
-            \url{http://cran.rakanu.com/web/packages/Matrix/vignettes/Comparisons.pdf}\cr
+            \url{https://CRAN.R-project.org/package=Matrix/vignettes/Comparisons.pdf}\cr
             
             Lumley, T. (2009) biglm: bounded memory linear and generalized linear models.\emph{ R package version 0.7}
             \url{https://CRAN.R-project.org/package=biglm}.

@@ -40,7 +40,7 @@ predict.speedlm <- function (object, newdata, na.action = na.pass, ...)
   }
   else {
     Terms <- delete.response(tt)
-    m <- model.frame(Terms, newdata, na.action = na.action)#, xlev = object$xlevels)
+    m <- model.frame(Terms, newdata, na.action = na.action, xlev = object$xlevels)
     if (!is.null(cl <- attr(Terms, "dataClasses"))) 
       .checkMFClasses(cl, m)
     X <- model.matrix(Terms, m, contrasts.arg = object$contrasts)

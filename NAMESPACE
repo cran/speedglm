@@ -7,11 +7,14 @@ importFrom(stats, ".checkMFClasses", "add.scope", "as.formula",
              "model.frame", "model.matrix", "model.offset",
              "model.response", "model.weights", "na.omit", "na.pass",
              "napredict", "pchisq", "pf", "pnorm", "pt", "terms",
-             "update.default", "update.formula","extractAIC","logLik","predict")
+             "update.default", "update.formula","extractAIC","logLik",
+             "predict","model.frame.default",
+             ".getXlevels","get_all_vars")
 
 
 export(speedglm, speedlm, speedlm.fit, speedlm.wfit, update.speedlm,
-       updateWithMoreData, shglm, speedglm.wfit, is.sparse, cp, control)
+       updateWithMoreData, shglm, speedglm.wfit, is.sparse, cp, control,
+      	predict.speedlm, predict.speedglm)
 
 S3method(summary,speedglm)
 S3method(print,speedglm)
@@ -43,6 +46,8 @@ S3method(predict,speedlm)
 S3method(predict,speedglm)
 S3method(nobs,speedlm)
 S3method(nobs,speedglm)
+S3method(model.frame,speedglm)
+S3method(model.frame,speedlm)
 
 
 

@@ -5,6 +5,22 @@
 *************************************
 
 ===============
+version 0.3-3
+=============== 
+* bug fixing: coefficient table in summary.speedglm is now returned without any limitation 
+  on the digits to visualize.
+* new (uncommented) functions model.frame.speedlm() and model.frame.speedglm().  
+* bug fixing: A bug concerning the model offset for speedlm(), update.speedlm() and 	
+  speedglm() has been fixed. 
+* bug fixing: A bug causing an error with function predict.speedlm() has been fixed. 
+  The error was due to missing levels from the model matrix returned by speedglm() and   
+  speedlm(). Now these are returned.
+* bug fixing: A bug causing an error on summary() when using speedglm.wfit, speedlm.fit 
+  and speedlm.wfit with X-matrix with no columns names has been fixed. 
+* Acknowledgements: the author is grateful to all those users who have reported bugs.
+
+
+===============
 version 0.3-2
 =============== 
 * new wrappers drop1() and add1() also for "speedglm" objects. Now it is possible to use functions step() and stepAIC() for both speedlm and speedglm objects but objects fitted using updateWithMoreData(). Note that these functions have been poorly tested and need to be checked out more carefully.
