@@ -119,8 +119,7 @@ In the most recent versions, function \code{update.speedlm} is now a wrapper to 
             
             Klotz, J.H. (1995) Updating Simple Linear Regression. \emph{Statistica Sinica}, \bold{5}, 399-403.\cr
             
-            Bates, D. (2009) Comparing Least Square Calculations. Technical report. Available at 
-            \url{https://CRAN.R-project.org/package=Matrix/vignettes/Comparisons.pdf}\cr
+            Bates, D. (2009) Comparing Least Square Calculations. Technical report.\cr
             
             Lumley, T. (2009) biglm: bounded memory linear and generalized linear models.\emph{ R package version 0.7}
             \url{https://CRAN.R-project.org/package=biglm}.

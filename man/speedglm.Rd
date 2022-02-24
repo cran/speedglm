@@ -124,14 +124,14 @@ The memory size of an object of class 'speedglm' is \eqn{O(p^2)}, where \eqn{p} 
   \item{model}{Either NULL or, if \code{model} was previously set to TRUE, the model frame. }  
   \item{y}{Either NULL or, if \code{y} was previously set to TRUE, the response variable. }  
   \item{linear.predictors}{Either NULL or, if \code{fitted} was previously set to TRUE, the fitted values. }    
+  \item{offset}{the model offset.}
 }
 
 \references{Enea, M. (2009) Fitting Linear Models and Generalized Linear Models with large data sets in R.
             In \emph{book of short papers, conference on ``Statistical Methods for the analysis of large data-sets'',
             Italian Statistical Society}, Chieti-Pescara, 23-25 September 2009, 411-414.\cr
             
-            Bates, D. (2009) Comparing Least Square Calculations. Technical report. Available at 
-            \url{https://CRAN.R-project.org/package=Matrix/vignettes/Comparisons.pdf}\cr
+            Bates, D. (2009) Comparing Least Square Calculations. Technical report. \cr
             
             Lumley, T. (2009) biglm: bounded memory linear and generalized linear models. \emph{R package version 0.7}.
             \url{https://CRAN.R-project.org/package=biglm}.

@@ -45,7 +45,7 @@ control<-function(B, symmetric = TRUE, tol.values = 1e-07, tol.vectors = 1e-07,
 cp <- function(X, w = NULL, row.chunk = NULL, sparse = FALSE){
   if (sparse) {
     if (!is.null(w)) X<-sqrt(w) * X
-    if (class(X) != "dgCMatrix")
+    if (!inherits(X,"dgCMatrix"))
       X <- as(X, "dgCMatrix")
     new.B <- crossprod(X)
   }

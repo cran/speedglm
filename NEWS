@@ -5,6 +5,14 @@
 *************************************
 
 ===============
+version 0.3-4
+===============
+* bug fixing: 'the condition has length > 1 and only the first element will be used'. 
+  Many thanks to the github user wkmor1 for providing the patch.
+* the author's email address has changed to marco.enea@unipa.it 
+
+
+===============
 version 0.3-3
 =============== 
 * bug fixing: coefficient table in summary.speedglm is now returned without any limitation 

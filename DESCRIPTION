@@ -1,23 +1,23 @@
 Package: speedglm
 Type: Package
 Title: Fitting Linear and Generalized Linear Models to Large Data Sets
-Version: 0.3-3
-Date: 2020-12-09
+Version: 0.3-4
+Date: 2022-02-19
 Authors@R: c(person("Marco", "Enea",
-                      email="emarco76@libero.it",
+                      email="marco.enea@unipa.it",
 	              role=c("aut", "cre")),
              person("Ronen", "Meiri", role=c("ctb"), comment="on behalf of DMWay Analytics LTD"),
              person("Tomer", "Kalimi", role=c("ctb"),comment="on behalf of DMWay Analytics LTD"))
 Author: Marco Enea [aut, cre],
   Ronen Meiri [ctb] (on behalf of DMWay Analytics LTD),
   Tomer Kalimi [ctb] (on behalf of DMWay Analytics LTD)
-Maintainer: Marco Enea <emarco76@libero.it>
+Maintainer: Marco Enea <marco.enea@unipa.it>
 Depends: Matrix, MASS
 Imports: methods, stats
 Description: Fitting linear models and generalized linear models to large data sets by updating algorithms.
 License: GPL
 LazyLoad: yes
 NeedsCompilation: no
-Packaged: 2021-01-05 20:03:31 UTC; Marco
+Packaged: 2022-02-24 12:19:16 UTC; marcoenea
 Repository: CRAN
-Date/Publication: 2021-01-08 14:00:02 UTC
+Date/Publication: 2022-02-24 18:20:02 UTC

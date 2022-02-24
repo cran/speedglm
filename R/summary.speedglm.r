@@ -138,6 +138,64 @@ print.summary.speedglm <- function (x, digits = max(3, getOption("digits") - 3),
   }
 }
 
+print.summary.speedglm <- function (x, digits = max(3, getOption("digits") - 3), ...) 
+{
+  cat("Generalized Linear Model of class 'speedglm':\n")
+  if (!is.null(x$call)) 
+    cat("\nCall: ", deparse(x$call), "\n\n")
+  if (length(x$coef)) {
+    cat("Coefficients:\n")
+    cat(" ------------------------------------------------------------------", 
+        "\n")
+    sig <- function(z){
+      if (!is.na(z)){
+        if (z < 0.001) 
+          "***"
+        else if (z < 0.01) 
+          "** "
+        else if (z < 0.05) 
+          "*  "
+        else if (z < 0.1) 
+          ".  "
+        else "   "
+      } else "   "
+    }
+    options(warn=-1)
+    sig.1 <- sapply(as.numeric(as.character(x$coefficients[,4])), 
+                    sig)
+    options(warn=0)
+    est.1 <- cbind(format(x$coefficients, digits = digits), 
+                   sig.1)
+    colnames(est.1)[ncol(est.1)] <- ""
+    print(est.1)
+    cat("\n")
+    cat("-------------------------------------------------------------------", 
+        "\n")
+    cat("Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1", 
+        "\n")
+    cat("\n")
+  }
+  else cat("No coefficients\n")
+  cat("---\n")
+  cat("null df: ", x$nulldf, "; null deviance: ", round(x$nulldev, 
+                                                        digits = 2), ";\n", "residuals df: ", x$df, "; residuals deviance: ", 
+      round(x$deviance, digits = 2), ";\n", "# obs.: ", x$n, 
+      "; # non-zero weighted obs.: ", x$ngoodobs, ";\n", "AIC: ", 
+      x$aic, "; log Likelihood: ", x$logLik, ";\n", "RSS: ", 
+      round(x$RSS, digits = 1), "; dispersion: ", x$dispersion, 
+      "; iterations: ", x$iter, ";\n", "rank: ", round(x$rank, 
+                                                       digits = 1), "; max tolerance: ", format(x$tol, scientific = TRUE, 
+                                                                                                digits = 3), "; convergence: ", x$convergence, ".\n", 
+      sep = "")
+  invisible(x)
+  if (x$correlation) {
+    cat("---\n")
+    cat("Correlation of Coefficients:\n")
+    x$correl[upper.tri(x$correl, diag = TRUE)] <- NA
+    print(x$correl[-1, -nrow(x$correl)], na.print = "", digits = 2)
+  }
+}
+
 
 print.speedglm <- function(x,digits = max(3, getOption("digits") - 3),...)
 {

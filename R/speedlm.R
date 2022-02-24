@@ -41,7 +41,7 @@ speedlm.fit <- function(y, X, intercept = FALSE, offset = NULL, row.chunk = NULL
     RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
   } else 
   if (method=="qr"){
-    if (class(A)=='dsCMatrix') {
+    if (inherits(A,'dsCMatrix')) {
       A <- as(A,'matrix')
       Xy <- as(Xy,'matrix')
     }
@@ -133,7 +133,7 @@ speedlm.wfit <- function(y, X, w, intercept = FALSE, offset = NULL, row.chunk = 
      RSS <- yy - 2 * crossprod(coef, Xy[ok]) + t(coef) %*% ris$XTX %*% coef
    } else
    if (method=="qr") {
-      if (class(A)=='dsCMatrix') {
+      if (inherits(A, 'dsCMatrix')) {
         A <- as(A,'matrix')
         Xy <- as(Xy,'matrix')
       }

@@ -12,8 +12,8 @@ of R memory, the fitting is made by an updating algorithm.}
 \tabular{ll}{
 Package: \tab speedglm\cr
 Type: \tab Package\cr
-Version: \tab 0.3-1\cr
-Date: \tab 2015-09-09\cr
+Version: \tab 0.3-4\cr
+Date: \tab 2022-02-19\cr
 Depends: \tab Matrix, stats, MASS\cr
 License: \tab GPL\cr
 LazyLoad: \tab yes\cr
@@ -21,9 +21,9 @@ LazyLoad: \tab yes\cr
 
 }
 \author{
-Marco Enea <emarco76@libero.it>, with contributions from Ronen Meiri and Tomer Kalimi (on behalf of DMWay Analytics LTD).
+Marco Enea <marco.enea@unipa.it>, with contributions from Ronen Meiri and Tomer Kalimi (on behalf of DMWay Analytics LTD).
 
-Maintainer: Marco Enea <emarco76@libero.it> 
+Maintainer: Marco Enea <marco.enea@unipa.it> 
 
 }
 
