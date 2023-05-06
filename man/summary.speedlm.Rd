@@ -51,12 +51,8 @@
 \seealso{ \link{speedlm} }
 \examples{
 
-y <- rnorm(100,1.5,1)
-x <- round(matrix(rnorm(200), 100, 2), digits = 3)
-colnames(x) <- c("s1","s2")
-da <- data.frame(y, x)
-
-m <- speedlm(y ~ s1 + s2,da)
+data(data1)
+m <- speedlm(y ~ x1 + x2 + factor(fat1), data1)
 summary(m)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

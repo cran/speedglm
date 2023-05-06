@@ -49,7 +49,6 @@ safe_pf <- function (q, df1, ...) #from stats
 
 
 aic.shglm <- function(family,y, n, mu, wt, dev){
-  options(warn=-1)
   a<-switch(family,
             binomial = aic.binomial(y, n, mu, wt, dev),
             Gamma = aic.Gamma(y, n, mu, wt, dev),
@@ -59,7 +58,6 @@ aic.shglm <- function(family,y, n, mu, wt, dev){
             quasi = NA,
             quasibinomial = NA,
             quasipoisson = NA)
- options(warn=1)
  return(a)
 }
 

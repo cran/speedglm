@@ -18,6 +18,7 @@ speedglm <- function (formula, data, family = gaussian(), weights = NULL,
   y <- M[[1]]
   tf <- attr(M, "terms")
   X <- model.matrix(tf, M)
+  weights <- as.vector(model.weights(M))
   offset <- model.offset(M)
   intercept <- attributes(tf)$intercept
   set <- list(sparselim = 0.9, camp = 0.01, eigendec = TRUE, 
@@ -105,7 +106,6 @@ speedglm.wfit <- function (y, X, intercept = TRUE, weights = NULL, row.chunk = N
   tol <- 1
   if ((fam == "gaussian") & (link == "identity")) 
     maxit <- 1
-  C_Cdqrls <- getNativeSymbolInfo("Cdqrls", PACKAGE = getLoadedDLLs()$stats)
   while ((tol > acc) & (iter < maxit)) {
     iter <- iter + 1
     beta <- start
@@ -133,7 +133,8 @@ speedglm.wfit <- function (y, X, intercept = TRUE, weights = NULL, row.chunk = N
       beta <- start
     }
     if (method == "qr") {
-      ris <- .Call(C_Cdqrls, XTX, XTz, tol.values, FALSE)
+      ris <- qr(XTX, tol.values)
+      ris$coefficients <- drop(qr.solve(ris, XTz, tol.values))
       start <- if (ris$rank < nvar) 
         ris$coefficients[ris$pivot]
       else ris$coefficients

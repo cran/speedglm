@@ -28,11 +28,9 @@
 
 \seealso{ \link{speedlm} }
 \examples{
-set.seed(10)
-x <- round( matrix(rnorm(20*3),20,3),digits=3)
-colnames(x) <-c("y","s1","s2")
-da <- as.data.frame(x)
-mod <- speedlm(y~s1+s2, data=da, fitted=TRUE)
+
+data(data1)
+mod <- speedglm(y~x1+x2+factor(fat1), data=data1, family=Gamma(log), fitted=TRUE)
 predict(mod)
 
 }

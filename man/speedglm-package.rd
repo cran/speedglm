@@ -6,14 +6,14 @@ Fitting Linear and Generalized Linear Models to Large Data Sets
 }
 \description{
 Fits Linear and Generalized Linear Models to large data sets. For data loaded in R memory the fitting is usually
-fast, especially if R is linked against an optimized BLAS. For data sets of size greater 
-of R memory, the fitting is made by an updating algorithm.}
+fast, especially if R is linked against an optimized BLAS. For data sets of size larger than 
+R memory, the fitting is made by an updating algorithm.}
 \details{
 \tabular{ll}{
 Package: \tab speedglm\cr
 Type: \tab Package\cr
-Version: \tab 0.3-4\cr
-Date: \tab 2022-02-19\cr
+Version: \tab 0.3-5\cr
+Date: \tab 2023-04-20\cr
 Depends: \tab Matrix, stats, MASS\cr
 License: \tab GPL\cr
 LazyLoad: \tab yes\cr

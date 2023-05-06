@@ -53,16 +53,10 @@
 %}
 \seealso{ \link{speedglm} }
 \examples{
-n<-1000
-k<-5
-y <- rgamma(n,1.5,1)
-x <-round( matrix(rnorm(n*k),n,k),digits=3)
-colnames(x) <-paste("s",1:k,sep = "")
-da<- data.frame(y,x)
-fo <- as.formula(paste("y~",paste(paste("s",1:k,sep=""),collapse="+")))
 
-m4 <- speedglm(fo,data=da,family=Gamma(log))
-summary(m4)
+data(data1)
+mod <- speedglm(y~x1+x2+factor(fat1), data=data1, family=Gamma(log))
+summary(mod)
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the
 % R documentation directory.

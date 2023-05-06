@@ -47,7 +47,7 @@ but with some difference.
   \item{datafun}{a function which uses connections. See the example below.}     
   \item{family}{the same of \code{glm}, but it must be specified with brackets.}
   \item{start}{the same of \code{glm}.}
-  \item{weights}{the same of \code{glm}, but it must be specified as \code{data$weights}.}
+  \item{weights}{the same of \code{glm}.}
   \item{weights.fo}{weights for the response. It must be specified as a formula 
   (see the example below).}
   \item{etastart}{the same of \code{glm}.}
@@ -77,7 +77,7 @@ but with some difference.
   \item{tol.solve}{see the function \link{solve}.}
   \item{tol.values}{see the function \link{control}.}
   \item{tol.vectors}{see the function \link{control}.}
-  \item{method}{the chosen method to detect for singulatity.}  
+  \item{method}{the method chosen to detect for singulatity.}  
   \item{model}{logical. If TRUE the model frame will be returned. }  
   \item{fitted}{logical. If TRUE the fitted values will be returned.}  
   \item{\dots}{further optional arguments.}
@@ -85,8 +85,8 @@ but with some difference.
 }
 \details{The function \code{shglm} works like
 \code{biglm}, but it checks for singularity and does not impose restrictions on 
-factors. Since during the IWLS estimation \code{shglm} uses repeated accesses to data file stored, for example, 
-into the hard disk, the estimation time could be very long. 
+factors. Since during the IWLS estimation \code{shglm} uses repeated accesses to 
+data file stored, for example, into the hard disk, the estimation time could be very long. 
 Unlike from \code{glm} or \code{biglm}, the functions of class 'speedglm' do not use 
  the QR decomposition, but directly solve the equations in the form of Iterative(-ly) (Re-)Weighted Least Squares (IWLS). 
 The memory size of an object of class 'speedglm' is \eqn{O(p^2)}, where \eqn{p} is the number of covariates, unless one or more of argument \code{model}, \code{y} and \code{fitted} are set to TRUE. If an optimized BLAS 
@@ -129,7 +129,7 @@ The memory size of an object of class 'speedglm' is \eqn{O(p^2)}, where \eqn{p} 
 
 \references{Enea, M. (2009) Fitting Linear Models and Generalized Linear Models with large data sets in R.
             In \emph{book of short papers, conference on ``Statistical Methods for the analysis of large data-sets'',
-            Italian Statistical Society}, Chieti-Pescara, 23-25 September 2009, 411-414.\cr
+            Italian Statistical Society}, Chieti-Pescara, 23-25 September 2009, 411-414. ISBN:978-88-6129-425-7\cr
             
             Bates, D. (2009) Comparing Least Square Calculations. Technical report. \cr
             
@@ -148,13 +148,13 @@ These will be restored in future.}
 \seealso{ \link{speedlm}, \link[biglm]{bigglm}, \link[stats]{glm} }
 \examples{
 
-\dontrun{
+\donttest{
 # The following comparison among glm(), bigglm() and speedglm() cannot be considered rigorous 
 # and exhaustive, but it is only to give an idea of the computation time. 
 # It may take a long time.
-require(biglm)
-n<-50000
-k<-80
+library(biglm)
+n<-10000
+k<-70
 y <- rgamma(n,1.5,1)
 x <-round( matrix(rnorm(n*k),n,k),digits=3)
 colnames(x) <-paste("s",1:k,sep = "")
@@ -168,10 +168,10 @@ system.time(m3 <- speedglm(fo,data=da,family=Gamma(log)))
 # You may also try speedglm when R is linked against an optimized BLAS,
 # otherwise try to run the following function. In some computers, it is
 # faster for large data sets.
-system.time(m4 <- speedglm(fo,data=da,family=Gamma(log),set.default=list(row.chunk=1000)))
-}
+system.time(m4 <- speedglm(fo,data=da,family=Gamma(log),set.default=list(row.chunk=50)))
+
 ##################
-\dontrun{
+
 ## An example of function using a connection to an out-memory file  
 ## This is a slightly modified version of the function from the bigglm's help page 
  make.data<-function(filename, chunksize,...){       
@@ -195,26 +195,22 @@ system.time(m4 <- speedglm(fo,data=da,family=Gamma(log),set.default=list(row.chu
 
 # data1 is a small toy dataset
 data(data1)
-write.table(data1,"data1.txt",row.names=FALSE,col.names=FALSE)
-rm(data1) 
+tmp_data1<-tempfile("data1",fileext=".txt")
+write.table(data1,tmp_data1,row.names=FALSE,col.names=FALSE)
 
-da<-make.data("data1.txt",chunksize=50,col.names=c("y","fat1","x1","x2"))
+da<-make.data(tmp_data1,chunksize=50,col.names=c("y","fat1","x1","x2"))
 
 # Caution! make sure to close the connection once you have run command #1
-da(reset=T) #1: opens the connection to "data1.txt"
-da(reset=F) #2: reads the first 50 rows (out of 100) of the dataset
-da(reset=F) #3: reads the second 50 rows (out of 100) of the dataset
-da(reset=F) #4: is NULL: this latter command closes the connection
+da(reset=TRUE) #1: opens the connection to "data1.txt"
+da(reset=FALSE) #2: reads the first 50 rows (out of 100) of the dataset
+da(reset=FALSE) #3: reads the second 50 rows (out of 100) of the dataset
+da(reset=FALSE) #4: is NULL: this latter command closes the connection
 
-
-require(biglm)        
 # fat1 is a factor with four levels                                    
 b1<-shglm(y~factor(fat1)+x1,weights=~I(x2^2),datafun=da,family=Gamma(log))
 b2<-bigglm(y~factor(fat1)+x1,weights=~I(x2^2),data=da,family=Gamma(log))
 summary(b1) 
 summary(b2) 
-
-file.remove("data1.txt")
 }
 }
 % Add one or more standard keywords, see file 'KEYWORDS' in the

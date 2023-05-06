@@ -45,8 +45,9 @@ speedlm.fit <- function(y, X, intercept = FALSE, offset = NULL, row.chunk = NULL
       A <- as(A,'matrix')
       Xy <- as(Xy,'matrix')
     }
-    C_Cdqrls <- getNativeSymbolInfo('Cdqrls', PACKAGE=getLoadedDLLs()$stats)
-    ris <- c(list(XTX=A), .Call(C_Cdqrls,A, Xy, tol.values, FALSE))
+    ris <- qr(A, tol.values)
+    ris$coefficients <- drop(qr.solve(ris, Xy, tol.values))
+    ris$XTX<-A
     coefficients<-ris$coefficients
     coef<-coefficients[ris$pivot[1:ris$rank]]
     ord <- ris$pivot
@@ -137,16 +138,17 @@ speedlm.wfit <- function(y, X, w, intercept = FALSE, offset = NULL, row.chunk = 
         A <- as(A,'matrix')
         Xy <- as(Xy,'matrix')
       }
-      C_Cdqrls<-getNativeSymbolInfo('Cdqrls', PACKAGE=getLoadedDLLs()$stats)
-      ris<-c(list(XTX=A), .Call(C_Cdqrls,A, Xy, tol.values, FALSE))
-      coefficients<-ris$coefficients
-      coef<-coefficients[ris$pivot[1:ris$rank]]
-      ord<-order(ris$pivot)
-      RSS <- yy - 2 * crossprod(coefficients, Xy[ris$pivot]) + t(coefficients[ord]) %*% ris$XTX %*% coefficients[ord]
-      ok<-ris$pivot[1:ris$rank]
-      if (ris$rank < nvar) 
-        coefficients[(ris$rank + 1L):nvar] <- NA
-      coefficients<-coefficients[ord]						 	
+     ris <- qr(A, tol.values)
+     ris$coefficients <- drop(qr.solve(ris, Xy, tol.values))
+     ris$XTX<-A
+     coefficients<-ris$coefficients
+     coef<-coefficients[ris$pivot[1:ris$rank]]
+     ord<-order(ris$pivot)
+     RSS <- yy - 2 * crossprod(coefficients, Xy[ris$pivot]) + t(coefficients[ord]) %*% ris$XTX %*% coefficients[ord]
+     ok<-ris$pivot[1:ris$rank]
+     if (ris$rank < nvar) 
+       coefficients[(ris$rank + 1L):nvar] <- NA
+     coefficients<-coefficients[ord]						 	
    } else
   stop('speedlm.fit: Unknown method value')
   
@@ -189,9 +191,12 @@ speedlm <- function(formula, data, weights = NULL, offset = NULL, sparse = NULL,
   y <- M[[1]]
   tf <- attr(M,"terms")
   X <- model.matrix(tf, M)
+  weights <- as.vector(model.weights(M))
   offset <- model.offset(M)
+  
   if (is.null(offset)) 
     offset <- rep(0, length(y))
+  
   set <- list(sparselim = 0.9, camp = 0.01, eigendec = TRUE, 
               row.chunk = NULL, tol.solve = .Machine$double.eps, tol.values = 1e-07, 
               tol.vectors = 1e-07, method = method)
@@ -220,7 +225,9 @@ speedlm <- function(formula, data, weights = NULL, offset = NULL, sparse = NULL,
                                 "'", "<-levels(M[,i])", sep = "")))
     }
   }
-  if(model) rval$model <- M
+  if(model) 
+    rval$model <- M
+    
   if(target) rval$y <- y
   rval$xlevels <- .getXlevels(tf, M)
   class(rval) <- "speedlm"
@@ -239,18 +246,32 @@ formula.speedlm <- function (x, ...)
     form
 }
 
+# update.speedlm <- function(object, formula, data, add=TRUE, evaluate=TRUE, 
+#                            subset=NULL, offset=NULL, weights=NULL,...) {
+#   if (!inherits(object, "speedlm")) 
+#     stop("object must be of class speedlm")
+#   if ((!missing(formula))&(!missing(data))&(add)) 
+#     stop('cannot specify a formula while adding new data')
+#   if ((!missing(data))&(add)) {
+#     mod <- updateWithMoreData(object, data=data, subset=subset, formula=formula.speedlm(object), offset=offset, weights=weights,...) }
+#   else{
+#    mod <- if (missing(data)) update.default(object, formula, evaluate=evaluate, offset=offset, weights=weights,...) else 
+#       update.default(object, formula, data=data, evaluate=evaluate,subset=subset,offset=offset, weights=weights,...)
+#   }  
+#   mod
+# }
+
 update.speedlm <- function(object, formula, data, add=TRUE, evaluate=TRUE, 
                            subset=NULL, offset=NULL, weights=NULL,...) {
   if (!inherits(object, "speedlm")) 
     stop("object must be of class speedlm")
-  if ((!missing(formula))&(!missing(data))&(add)) 
-    stop('cannot specify a formula while adding new data')
-  if ((!missing(data))&(add)) {
-    mod <- updateWithMoreData(object, data=data, subset=subset, formula=formula.speedlm(object), offset=offset, weights=weights,...) }
-  else{
-   mod <- if (missing(data)) update.default(object, formula, evaluate=evaluate, offset=offset, weights=weights,...) else 
-      update.default(object, formula, data=data, evaluate=evaluate,subset=subset,offset=offset, weights=weights,...)
-  }  
+  if ((!missing(formula))&&(formula!=object$formula)&(!missing(data))&(add)) 
+    stop('cannot specify a new formula while adding new data')
+  
+  m<-match.call()
+  m[[1L]] <- if ((!missing(data))&(add)) quote(updateWithMoreData) else 
+                 quote(update.default)
+  mod <- eval(m,parent.frame())
   mod
 }
 
@@ -269,9 +290,9 @@ updateWithMoreData <- function(object, data, weights = NULL, offset = NULL,
   M <- M[c(1L, m)]
   M$drop.unused.levels <- TRUE
   M[[1L]] <- quote(stats::model.frame)
-  #browser()
   M <- eval(M, parent.frame())
   y <- M[[1]]   
+  weights <- as.vector(model.weights(M))
   set <- list(sparselim = 0.9, camp = 0.01, eigendec = TRUE, 
               row.chunk = NULL, tol.solve = .Machine$double.eps, tol.values = 1e-07, 
               tol.vectors = 1e-07, method = object$method)

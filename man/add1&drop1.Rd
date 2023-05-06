@@ -9,7 +9,7 @@
 \alias{nobs.speedglm}
 
 %- Also NEED an '\alias' for EACH other topic documented here.
-\title{Wrappers to the add1 and drop1 methods for speedlm and speedglm objects}
+\title{Wrappers to the \code{add1} and \code{drop1} methods for speedlm and speedglm objects}
 
 \description{
 These are adviced to be used for \code{speedlm} and \code{speedglm} models fitted on moderately large data sets. It is also possible to use \link[MASS]{stepAIC} function from package \code{MASS}.
@@ -24,10 +24,10 @@ These are adviced to be used for \code{speedlm} and \code{speedglm} models fitte
 \method{nobs}{speedlm}(object, use.fallback = FALSE, ...)
 
 ## S3 method for class 'speedglm'
-\method{add1}{speedglm}(object, scope, scale = 0, test = c("none", "Rao", "LRT", 
-                         "Chisq", "F"), x = NULL, k = 2, weights=rep(1,object$n), ...) 
-\method{drop1}{speedglm}(object, scope, scale = 0, test = c("none", "Rao", "LRT", 
-                         "Chisq", "F"), k = 2, weights=rep(1,object$n), ...)
+\method{add1}{speedglm}(object, scope, scale = 0, test = c("none", "LRT", 
+                         "Chisq", "F"), x = NULL, k = 2, ...) 
+\method{drop1}{speedglm}(object, scope, scale = 0, test = c("none", "LRT", 
+                         "Chisq", "F"), k = 2, ...)
 \method{extractAIC}{speedglm}(fit, scale = 0, k=2,...)
 \method{nobs}{speedglm}(object, use.fallback = FALSE, ...) 
 
@@ -39,17 +39,20 @@ These are adviced to be used for \code{speedlm} and \code{speedglm} models fitte
   \item{scope}{see \link[stats]{add1} from package \code{stats}.}
   \item{scale}{see \link[stats]{add1} from package \code{stats}.}
   \item{all.cols}{see \link[stats]{drop1} from package \code{stats}.}
-  \item{test}{see \link[stats]{add1} from package \code{stats}.}
+  \item{test}{see \link[stats]{add1} from package \code{stats}. Currently, test \code{"Rao"} is not implemented.}
   \item{x}{see \link[stats]{add1} from package \code{stats}.}
   \item{k}{see \link[stats]{add1} from package \code{stats}.}
   \item{data}{the data that the model was previously fitted to. 
               If not provided, these will be searched in the parent environment.}
-  \item{weights}{the model weights, if provided in the speedglm object}
   \item{use.fallback}{logical. Should fallback methods be used to try to guess the value?}
   \item{\dots}{further optional arguments.}
 }
 
-\details{It is possible to use functions step() and stepAIC() for both speedlm and speedglm objects but objects fitted using updateWithMoreData()}
+\details{It is possible to use functions step() and stepAIC() for both speedlm and speedglm objects but objects fitted using updateWithMoreData().}
+
+\value{An object of classes "\code{anova}" and "\code{data.frame}" summarizing the differences in fit between the models.}
+  
+
 \author{
 Ronen Meiri and Marco Enea
 }
@@ -57,9 +60,9 @@ Ronen Meiri and Marco Enea
 
 
 \examples{
-\dontrun{
+
 set.seed(10)
-n <- 1000
+n <- 50
 k <- 3
 x <- round(matrix(rnorm(n * k), n, k), digits = 3)
 beta <- c(0.05,0.5,0.8,1.3,1.8)
@@ -68,14 +71,9 @@ colnames(x) <- c("s1", "s2", "s3")
 da <- data.frame(y, x)
 
 m0 <- speedlm(y ~ 1, data = da,model=TRUE, y=TRUE)
-m0.1 <- add1(m0,scope=~(s1+s2+s3)^2, data = da)
-m1 <- step(m0,scope=~(s1+s2+s3)^3)
+m0.1 <- add1(m0,scope=~s1+s2+s3, data = da)
+m1 <- step(m0,scope=~s1+s2+s3)
 m1
 
-m2 <- speedglm(y ~ 1, data = da, model=TRUE, y=TRUE)
-m2.1 <- add1(m2,scope=~(s1+s2+s3)^2, data = da)
-m3 <- step(m2,scope=~(s1+s2+s3)^3)
-m3
-}
 }
 

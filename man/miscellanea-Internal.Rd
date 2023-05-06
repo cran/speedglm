@@ -71,24 +71,20 @@ for the function \code{is.sparse}:
 \examples{
 #### example 1.
 
-n <- 100000
-k <- 100
+n <- 100
+k <- 5
 x <- round(matrix(rnorm(n*k),n,k),digits=4)
 y <- rnorm(n)
 
 # if an optimized BLAS is not installed, depending on processor type, cp() may be 
 # faster than crossprod() for large matrices.
 
-system.time(a1 <- crossprod(x))
-system.time(a2 <- cp(x,,row.chunk = 500))
+a1 <- crossprod(x)
+a2 <- cp(x,,row.chunk = 50)
 all.equal(a1, a2)  
 
 #### example 2.1.
-n <- 100000
-k <- 10
-x <- matrix(rnorm(n*k),n,k)
 x[,2] <- x[,1] + 2*x[,3]  # x has rank 9
-y <- rnorm(n)
 
 # estimation by least squares 
 A <- function(){
@@ -101,23 +97,15 @@ B <- function(){
   B1 <- qr(x)
   qr.solve(x[,B1$pivot[1:B1$rank]],y)    
 }  
-system.time(a <- A())
-system.time(b <- B())
+a <- A()
+b <- B()
 
 all.equal(a,b)
 
-###  example 2.2
-x <- matrix(c(1:5, (1:5)^2), 5, 2)
-x <- cbind(x, x[, 1] + 3*x[, 2])
-m <- crossprod(x)
-qr(m)$rank # is 2, as it should be
-control(m,method="eigen")$rank # is 2, as it should be
-control(m,method="Cholesky")$rank # is wrong
-
 
 ### example 3. 
-n <- 10000
-fat1 <- gl(20,500)
+n <- 1000
+fat1 <- gl(20,50)
 y <- rnorm(n)
 da <- data.frame(y,fat1)
 m <- model.matrix(y ~ factor(fat1),data = da)

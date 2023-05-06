@@ -1,10 +1,10 @@
-import(Matrix, MASS)
+import(Matrix, MASS, biglm)
 importFrom(stats,nobs,family)
 importFrom(methods, "as")
 importFrom(stats, ".checkMFClasses", "add.scope", "as.formula",
              "dbinom", "delete.response", "dgamma", "dpois",
              "drop.scope", "fitted", "formula", "gaussian", "getCall",
-             "model.frame", "model.matrix", "model.offset",
+             "model.frame", "model.matrix", "model.offset", "weights",
              "model.response", "model.weights", "na.omit", "na.pass",
              "napredict", "pchisq", "pf", "pnorm", "pt", "terms",
              "update.default", "update.formula","extractAIC","logLik",

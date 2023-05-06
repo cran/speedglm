@@ -196,7 +196,7 @@ extractAIC.speedlm<-function(fit, scale=0, k=2,...)
 }
 
 drop1.speedlm<-function (object, scope, scale = 0, all.cols = TRUE,test = c("none","Chisq", "F"), k = 2, data, ...) {
-  #	check_exact(object)
+  if (is.null(object$model)) stop("object must be fitted with options model=TRUE, y=TRUE and fitted=TRUE")
   x <- model.matrix(object$terms, (if(missing(data)) object$model else data))  
   offset <- model.offset(model.frame(object))
   iswt <- !is.null(wt <- object$weights)
@@ -279,6 +279,7 @@ drop1.speedlm<-function (object, scope, scale = 0, all.cols = TRUE,test = c("non
 
 add1.speedlm<-function (object, scope, scale = 0, test = c("none", "Chisq","F"), x = NULL, k = 2,data, ...) 
 {
+  if (is.null(object$model)) stop("object must be fitted with options model=TRUE, y=TRUE and fitted=TRUE")
   Fstat <- function(table, RSS, rdf) {
     dev <- table$"Sum of Sq"
     df <- table$Df

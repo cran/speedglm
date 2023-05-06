@@ -43,10 +43,9 @@ updateWithMoreData(object, data, weights = NULL, offset = NULL, sparse = NULL,
 Most of arguments are the same of functions \link[stats]{lm} but with 
 some difference.  
   \item{formula}{the same of function \code{lm}.}
-  \item{data}{the same of function \code{lm}, but it must always specified.}
-  \item{weights}{the same of function \code{lm}, but it must be specified as
-       \code{data$weights}.}
-  \item{w}{the same of \code{weights}.}  
+  \item{data}{the same of function \code{lm}.}
+  \item{weights}{the same of function \code{lm}.}
+  \item{w}{model weights.}  
   \item{intercept}{a logical value which indicates if an intercept is used.} 
   \item{offset}{the same of function \code{lm}.}
   \item{X}{the same of \code{x} in function \code{lm}.}
@@ -65,7 +64,8 @@ some difference.
   \item{tol.solve}{see function \link{solve}.}
   \item{tol.values}{see function \link{control}.}
   \item{tol.vectors}{see function \link{control}.}
-  \item{method}{see function \link{control}.}
+  \item{method}{the method used to check for singularity. The default is 'eigen'.
+        See details}
   \item{object}{an object of class 'speedlm'.}
   \item{all.levels}{are all levels of eventual factors present in each data
         chunk? If so, set \code{all.levels} to true to speed up the fitting.}
@@ -77,14 +77,23 @@ some difference.
   \item{\dots}{further optional arguments.}
   
 }
-\details{Unlikely from \link[stats]{lm} or \link[biglm]{biglm}, the functions of class 'speedlm' do not use 
- the QR decomposition but directly solve the normal equations. Further, the most recent version of the package include method 'qr'. However such qr decomposition is not applied directly on matrix X, but on X'WX.   
- In some extreme case, this might have some problem of numerical stability but may take advantage from the use of 
- an optimized BLAS. The memory size of an object of class 'speedlm' is \eqn{O(p^2)}, where \eqn{p} is the number of covariates.
- If an optimized BLAS library is not installed, an attempt to speed up calculations may be done by setting \code{row.chunk} 
- to some value, usually less than 1000, in \code{set.default}. See the function \link{cp} for details. Factors are permitted 
- without limitations. \cr
-In the most recent versions, function \code{update.speedlm} is now a wrapper to call either \code{updateWithMoreData}  (the new name of the old \code{update.speedlm}, for additional data chunks), or \link[stats]{update} from package \code{stats}. 
+\details{Unlikely from \link[stats]{lm} or \link[biglm]{biglm}, the functions of 
+class 'speedlm' do not use the QR decomposition of the X-matrix, but directly 
+solve the normal equations.  In some extreme case, this might have some problem 
+of numerical stability, but it may take advantage from the use of 
+ an optimized BLAS. To check for singularity, three options are available. 
+ Method "eigen" performs an eigendecomposition of X'X. The 'Cholesky' method is 
+faster than "eigen" and does not use tolerance, but the former 
+seems to be more stable for opportune tolerance values. Method 'qr' does 
+not perform a QR decomposition directly on matrix X, but on X'WX.   
+ The memory size of an object of class 'speedlm' is \eqn{O(p^2)}, where \eqn{p} 
+ is the number of covariates. If an optimized BLAS library is not installed, an 
+ attempt to speed up calculations may be done by setting \code{row.chunk} 
+ to some value, usually less than 1000, in \code{set.default}. See the function 
+ \link{cp} for details. Factors are permitted without limitations. \cr
+In the most recent versions, function \code{update.speedlm} is now a wrapper to 
+call either \code{updateWithMoreData}  (the new name of the old \code{update.speedlm}, 
+for additional data chunks), or \link[stats]{update} from package \code{stats}. 
 }
 \value{
   \item{coefficients}{the estimated coefficients.}
@@ -115,7 +124,7 @@ In the most recent versions, function \code{update.speedlm} is now a wrapper to 
 }
 \references{Enea, M. (2009) Fitting Linear Models and Generalized Linear Models With Large Data Sets in R.
             In \emph{book of short papers, conference on ``Statistical Methods for the analysis of large data-sets'',
-            Italian Statistical Society}, Chieti-Pescara, 23-25 September 2009, 411-414.\cr
+            Italian Statistical Society}, Chieti-Pescara, 23-25 September 2009, 411-414. ISBN:978-88-6129-425-7\cr
             
             Klotz, J.H. (1995) Updating Simple Linear Regression. \emph{Statistica Sinica}, \bold{5}, 399-403.\cr
             
@@ -130,29 +139,25 @@ In the most recent versions, function \code{update.speedlm} is now a wrapper to 
 %}
 \seealso{ \link{summary.speedlm},\link{speedglm}, \link[stats]{lm}, and \link[biglm]{biglm} }
 \examples{
-\dontrun{
-n <- 1000
-k <- 3
-y <- rnorm(n)
-x <- round(matrix(rnorm(n * k), n, k), digits = 3)
-colnames(x) <- c("s1", "s2", "s3") 
-da <- data.frame(y, x)
-do1 <- da[1:300,]
-do2 <- da[301:700,]
-do3 <- da[701:1000,]
+\donttest{
+data(data1)
+da <- data1
+do1 <- da[1:30,]
+do2 <- da[31:70,]
+do3 <- da[71:100,]
 
-m1 <- speedlm(y ~ s1 + s2 + s3, data = do1)
+m1 <- speedlm(y ~ factor(fat1) + x1 + x2, data = do1)
 m1 <- update(m1, data = do2)
 m1 <- update(m1, data = do3)
 
-m2 <- lm(y ~ s1 + s2 + s3, data = da)
+m2 <- lm(y ~ factor(fat1) + x1 + x2, data = data1)
 summary(m1)
 summary(m2)
-}
 
-\dontrun{
-  # as before but recursively
-  make.data <- function(filename, chunksize,...){       
+
+
+# as before but recursively
+make.data <- function(filename, chunksize,...){       
     conn <- NULL
     function(reset=FALSE, header=TRUE){
       if(reset){
@@ -168,26 +173,25 @@ summary(m2)
         return(rval)
       }
     }
-  }
-
-  write.table(da,"da.txt",col.names=TRUE,row.names=FALSE,quote=FALSE) 
-  x.names <- c("s1", "s2", "s3")
-  dat <- make.data("da.txt",chunksize=300,col.names=c("y",x.names))
-  dat(reset=TRUE) 
-  da2 <- dat(reset=FALSE)
-  
-  # the first model runs on the first 300 rows.
-  m3 <- speedlm(y ~ s1 + s2 + s3, data=da2)
-
-  # the last three models run on the subsequent 300, 300 and 100 rows, respectively
-  for (i in 1:3){
-    da2 <- dat(reset=FALSE, header=FALSE)
-    m3 <- update(m3, data=da2, add=TRUE)
-  }  
-  all.equal(coef(m1),coef(m3))  
-  file.remove("da.txt")
 }
 
+tmp_da<-tempfile("da",fileext=".txt")
+write.table(da,tmp_da,col.names=TRUE,row.names=FALSE,quote=FALSE) 
+
+dat <- make.data(tmp_da,chunksize=30,col.names=c("y","fat1","x1", "x2"))
+dat(reset=TRUE) 
+da2 <- dat(reset=FALSE)
+  
+# the first model runs on the first 30 rows.
+m3 <- speedlm(y ~ factor(fat1) + x1 + x2, data=da2)
+
+# the last three models run on the subsequent 30, 30 and 10 rows, respectively
+for (i in 1:3){
+  da2 <- dat(reset=FALSE, header=FALSE)
+  m3 <- update(m3, data=da2, add=TRUE)
+}  
+all.equal(coef(m1),coef(m3))  
+}
 }
 
 

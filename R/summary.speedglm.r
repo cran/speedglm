@@ -102,10 +102,8 @@ print.summary.speedglm <- function (x, digits = max(3, getOption("digits") - 3),
         else "   "
       } else "   "
     }
-    options(warn=-1)
     sig.1 <- sapply(as.numeric(as.character(x$coefficients[,4])), 
                     sig)
-    options(warn=0)
     est.1 <- cbind(format(x$coefficients, digits = digits), 
                    sig.1)
     colnames(est.1)[ncol(est.1)] <- ""
@@ -160,10 +158,8 @@ print.summary.speedglm <- function (x, digits = max(3, getOption("digits") - 3),
         else "   "
       } else "   "
     }
-    options(warn=-1)
     sig.1 <- sapply(as.numeric(as.character(x$coefficients[,4])), 
                     sig)
-    options(warn=0)
     est.1 <- cbind(format(x$coefficients, digits = digits), 
                    sig.1)
     colnames(est.1)[ncol(est.1)] <- ""
@@ -253,8 +249,8 @@ extractAIC.speedglm<-function(fit, scale=0, k=2,...)
   c(edf, aic +  (k - 2) * edf)
 }
 
-drop1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LRT", 
-                            "Chisq", "F"), k = 2, weights=rep(1,object$n), ...) 
+drop1.speedglm <- function(object, scope, scale = 0, test = c("none", "LRT", 
+                            "Chisq", "F"), k = 2, ...) 
 {
   if (is.null(object$model)) stop("object must be fitted with options model=TRUE, y=TRUE and fitted=TRUE")
   test <- match.arg(test)
@@ -281,12 +277,13 @@ drop1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LR
   dev <- numeric(ns)
   score <- numeric(ns)
   y <- object$y
+  m <- model.frame(object)
   if (is.null(y)) {
-    y <- model.response(model.frame(object))
+    y <- model.response(m)
     if (!is.factor(y)) 
       storage.mode(y) <- "double"
   }
-  wt <- weights
+  wt <- model.weights(m)
   if (is.null(wt)) 
     wt <- rep.int(1, n)
   for (i in seq_len(ns)) {
@@ -373,9 +370,10 @@ drop1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LR
   aod
 }
 
-add1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LRT", 
-                          "Chisq", "F"), x=NULL, k = 2, weights=rep(1,object$n), ...) 
+add1.speedglm <- function(object, scope, scale = 0, test = c("none", "LRT", 
+                          "Chisq", "F"), x=NULL, k = 2, ...) 
 {
+
   if (is.null(object$model)) stop("object must be fitted with options model=TRUE, y=TRUE and fitted=TRUE")
   Fstat <- function(table, rdf) {
     dev <- table$Deviance
@@ -413,7 +411,7 @@ add1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LRT
     class(fob) <- oldClass(object)
     m <- model.frame(fob)
     offset <- model.offset(m)
-    wt <- weights
+    wt <- model.weights(m)
     x <- model.matrix(Terms, m, contrasts.arg = object$contrasts)
     oldn <- length(y)
     y <- model.response(m)
@@ -436,6 +434,7 @@ add1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LRT
     wt <- object$prior.weights
     offset <- object$offset
   }
+
   n <- nrow(x)
   if (is.null(wt)) 
     wt <- rep.int(1, n)
@@ -445,7 +444,7 @@ add1.speedglm <- function(object, scope, scale = 0, test = c("none", "Rao", "LRT
   if (int) 
     ousex[1L] <- TRUE
   X <- x[, ousex, drop = FALSE]
-  z <- speedglm.wfit(y, X, , wt, offset = offset, family = object$family)
+  z <- speedglm.wfit(y, X, int, wt,offset = offset, family = object$family)
   dfs[1L] <- z$rank
   dev[1L] <- z$deviance
   r <- z$residuals

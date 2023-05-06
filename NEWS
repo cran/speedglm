@@ -1,8 +1,19 @@
 *************************************
-*				    *
-*	Changes in speedglm	    *
-*				    *
+*				    		*
+*	Changes in speedglm	      *
+*				            *
 *************************************
+
+
+===============
+version 0.3-5
+===============
+* method 'qr' in both spedglm() and speedlm() has been modified, as the previous code for this method 
+  resulted in a violation of the CRAN policy. Now the method is based on function qr() of package stats.
+* speedlm(), update.speedlm(), and speedglm() were modified to accept weights directly in the form 
+  weights=w instead of weights=data$w.
+* several examples were resized to allow a shorter execution time.
+
 
 ===============
 version 0.3-4
